@@ -63,9 +63,9 @@ game   : "Harley-Davidson - Race Across America"\
 ext    : [.mdl]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-07-21-14-54-595-1.gif)
 \
-plugin : ![](https://forum.xentax.com/viewtopic.php?f=16&t=25488#p185000) \
+plugin : [Link to Xentax Topic](https://forum.xentax.com/viewtopic.php?f=16&t=25488#p185000) \
 game   : "Miami Vice - The Game (PSP)"\
 ext    : [ - ]\
-[Link to Xentax Topic](https://s8.gifyu.com/images/bandicam-2022-06-04-23-14-47-807-1.gif)
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-04-23-14-47-807-1.gif)
 \
 
