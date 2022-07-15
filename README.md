@@ -43,8 +43,14 @@ game   : "Diablo Immortal"\
 ext    : [.model]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-19-00-33-36-882-1.gif)
 \
-plugin : fmt_model_5.py \
-game   : "Diablo Immortal"\
-ext    : [.model]\
+plugin : fmt_MonsterHigh.py \
+game   : "MonsterHigh (Wii), barbie dreamhouse party(Wii)"\
+ext    : [.hnk]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-02-22-29-48-852-1.gif)
 \
+plugin : fmt_barbie_pc.py \
+game   : "barbie dreamhouse party"\
+ext    : [.hnk]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-02-22-29-48-852-1.gif)
+\
+
