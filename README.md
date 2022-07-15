@@ -128,3 +128,8 @@ game   : "Bus Derby (iOS)"\
 ext    : [.obj]\
 ![Alt Text](https://s8.gifyu.com/images/red5df3aa3ea1f7df48.png)
 \
+plugin : fmt_grp_9.py, fmt_m3d_9.py, fmt_rez_9.py \
+game   : "Winter X-Games: Snocross"\
+ext    : [.grp][.m3d][.rez]\
+![Alt Text](https://s8.gifyu.com/images/ss74551b63bec3339f.png)
+\
