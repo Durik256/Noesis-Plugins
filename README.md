@@ -46,5 +46,5 @@ ext    : [.model]\
 plugin : fmt_model_5.py \
 game   : "Diablo Immortal"\
 ext    : [.model]\
-![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-02-22-29-48-852-1.md.gif)
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-02-22-29-48-852-1.gif)
 \
