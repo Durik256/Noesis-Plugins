@@ -68,4 +68,19 @@ game   : "Miami Vice - The Game (PSP)"\
 ext    : [ - ]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-04-23-14-47-807-1.gif)
 \
+plugin : fmt_GM2.py \
+game   : "Blood +: One Night Kiss"\
+ext    : [.GM2]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-04-15-25-51-420-1.gif)
+\
+plugin : fmt_jboy.py \
+game   : "Pacific rim"\
+ext    : [.jboy]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-21-21-01-49-171-1.gif)
+\
+plugin : fmt_axmd.py \
+game   : "The Strongest Hero"\
+ext    : [.axmd]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-20-23-20-47-651-1.gif)
+\
 
