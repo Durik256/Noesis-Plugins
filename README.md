@@ -153,3 +153,8 @@ game   : "chuanshuo OL"\
 ext    : [.mesh]\
 ![Alt Text](https://s8.gifyu.com/images/body46a0129b773b83ad.png)
 \
+plugin : fmt_3dc.py, fmt_ani.py \
+game   : "Shaiya"\
+ext    : [.3dc], [.ani]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-03-15-02-21-04-434-1.gif)
+\
