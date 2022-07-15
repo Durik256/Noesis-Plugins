@@ -158,3 +158,8 @@ game   : "Shaiya"\
 ext    : [.3dc], [.ani]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-03-15-02-21-04-434-1.gif)
 \
+plugin : fmt_zit.py \
+game   : "Aggressive Inline"\
+ext    : [.zit]\
+![Alt Text](https://s8.gifyu.com/images/AG_Zit.ZIT.png)
+\
