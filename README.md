@@ -19,8 +19,13 @@ ext    : [.c3]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-07-14-14-39-04-955-1.gif)
 \
 plugin : fmt_FF1_MDL[XBOX].py \
-game   : "Ah My Goddess (PS2)"\
+game   : "Fatal Frame 1 (XBOX)"\
 ext    : [.mdl]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-07-11-17-23-39-071-1.gif)
+\
+plugin : fmt_FF1_MDL[PS2].py \
+game   : "Fatal Frame 1 (PS2)"\
+ext    : [.mdl]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-07-09-23-21-31-247cca494bcc560ccd3-1.gif)
 \
 
