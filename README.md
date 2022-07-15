@@ -51,6 +51,6 @@ ext    : [.hnk]\
 plugin : fmt_barbie_pc.py \
 game   : "barbie dreamhouse party"\
 ext    : [.hnk]\
-![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-02-22-29-48-852-1.gif)
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-12-22-14-04-745-1.gif)
 \
 
