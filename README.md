@@ -118,3 +118,8 @@ game   : "Dead Space 2 (PS3) DLC"\
 ext    : [.geo]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-04-22-02-55-50-002-1.gif)
 \
+plugin : fmt_dcm.py \
+game   : "Team6"\
+ext    : [.dcm]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-03-23-12-38-03-843.jpg)
+\
