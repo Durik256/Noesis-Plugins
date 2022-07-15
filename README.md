@@ -135,6 +135,11 @@ ext    : [.grp][.m3d][.rez]\
 \
 plugin : fmt_geo.py \
 game   : "Need for Speed Underground"\
-ext    : [geo.bin]\
+ext    : [.geo.bin]\
 ![Alt Text](https://s8.gifyu.com/images/xxdf4a811c3010d29e.png)
+\
+plugin : fmt_dxg.py \
+game   : "Cars (PC)"\
+ext    : [.dxg]\
+![Alt Text](https://s8.gifyu.com/images/chase154ef7e18888776.png)
 \
