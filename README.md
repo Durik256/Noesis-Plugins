@@ -130,7 +130,7 @@ ext    : [.obj]\
 \
 plugin : fmt_grp_9.py, fmt_m3d_9.py, fmt_rez_9.py \
 game   : "Winter X-Games: Snocross"\
-ext    : [.grp][.m3d][.rez]\
+ext    : [.grp],[.m3d],[.rez]\
 ![Alt Text](https://s8.gifyu.com/images/ss74551b63bec3339f.png)
 \
 plugin : fmt_geo.py \
@@ -142,4 +142,9 @@ plugin : fmt_dxg.py \
 game   : "Cars (PC)"\
 ext    : [.dxg]\
 ![Alt Text](https://s8.gifyu.com/images/chase154ef7e18888776.png)
+\
+plugin : fmt_p3d.py, fmt_p3d_json.py [Link to Xentax Topic](https://forum.xentax.com/viewtopic.php?f=16&t=25140#p183178)\
+game   : "Ragnarok Web"\
+ext    : [.p3d],[.json]\
+![Alt Text](https://s8.gifyu.com/images/baiyangzuonan43eb2a3e7a4572e7-1.png)
 \
