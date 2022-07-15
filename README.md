@@ -133,3 +133,8 @@ game   : "Winter X-Games: Snocross"\
 ext    : [.grp][.m3d][.rez]\
 ![Alt Text](https://s8.gifyu.com/images/ss74551b63bec3339f.png)
 \
+plugin : fmt_geo.py \
+game   : "Need for Speed Underground"\
+ext    : [geo.bin]\
+![Alt Text](https://s8.gifyu.com/images/xxdf4a811c3010d29e.png)
+\
