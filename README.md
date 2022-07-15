@@ -103,4 +103,14 @@ game   : "Android Car Audio"\
 ext    : [.bin]\
 ![Alt Text](https://s8.gifyu.com/images/car_audid637508ca21f6c1e.png)
 \
+plugin : fmt_out.py \
+game   : "Omega Zodiac"\
+ext    : [.out]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-12-19-39-35-594-1.gif)
+\
+plugin : fmt_msh.py \
+game   : "Warhammer Gladius"\
+ext    : [.msh]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-04-24-17-58-09-076-1.gif)
+\
 
