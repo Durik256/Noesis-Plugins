@@ -98,4 +98,9 @@ game   : "Project IGI 1/2"\
 ext    : [.mef]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-04-22-22-58-29-844-1.gif)
 \
+plugin : fmt_car_audio.py [Link to Xentax Topic](https://forum.xentax.com/viewtopic.php?f=16&t=25344#p184464) \
+game   : "Android Car Audio"\
+ext    : [.bin]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-04-22-22-58-29-844-1.gif)
+\
 
