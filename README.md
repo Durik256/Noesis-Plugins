@@ -28,7 +28,7 @@ game   : "Fatal Frame 1 (PS2)"\
 ext    : [.mdl]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-07-09-23-21-31-247cca494bcc560ccd3-1.gif)
 \
-plugin : fmt_FF1_MDL[PS2].py \
+plugin : fmt_ylm.py \
 game   : "Aerial Strike: The Yager Missions"\
 ext    : [.ylm]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-28-01-02-53-826-1.gif)
