@@ -83,4 +83,9 @@ game   : "The Strongest Hero"\
 ext    : [.axmd]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-20-23-20-47-651-1.gif)
 \
+plugin : fmt_Madoka_PSVita.py \
+game   : "Madoka Magica (PSVita)"\
+ext    : [.mdl]\
+![Alt Text](https://s8.gifyu.com/images/Madoka_Magika_PS_VITA-1.gif)
+\
 
