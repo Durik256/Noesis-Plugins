@@ -53,4 +53,9 @@ game   : "barbie dreamhouse party"\
 ext    : [.hnk]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-12-22-14-04-745-1.gif)
 \
+plugin : fmt_dat_0.py \
+game   : "Hydro Thunder Hurricane [XB360]"\
+ext    : [.dat]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-16-13-31-09-761-1.gif)
+\
 
