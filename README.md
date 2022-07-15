@@ -113,4 +113,8 @@ game   : "Warhammer Gladius"\
 ext    : [.msh]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-04-24-17-58-09-076-1.gif)
 \
-
+plugin : fmt_DS2_PS3_geo.py \
+game   : "Dead Space 2 (PS3) DLC"\
+ext    : [.geo]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-04-22-02-55-50-002-1.gif)
+\
