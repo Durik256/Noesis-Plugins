@@ -54,8 +54,18 @@ ext    : [.hnk]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-12-22-14-04-745-1.gif)
 \
 plugin : fmt_dat_0.py \
-game   : "Hydro Thunder Hurricane [XB360]"\
+game   : "Hydro Thunder Hurricane (XB360)"\
 ext    : [.dat]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-16-13-31-09-761-1.gif)
+\
+plugin : fmt_MDL_HARLY.py \
+game   : "Harley-Davidson - Race Across America"\
+ext    : [.mdl]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-07-21-14-54-595-1.gif)
+\
+plugin : ![](https://forum.xentax.com/viewtopic.php?f=16&t=25488#p185000) \
+game   : "Miami Vice - The Game (PSP)"\
+ext    : [.]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-04-23-14-47-807-1.gif)
 \
 
