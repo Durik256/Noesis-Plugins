@@ -148,3 +148,8 @@ game   : "Ragnarok Web"\
 ext    : [.p3d],[.json]\
 ![Alt Text](https://s8.gifyu.com/images/baiyangzuonan43eb2a3e7a4572e7-1.png)
 \
+plugin : fmt_mesh2.py \
+game   : "chuanshuo OL"\
+ext    : [.mesh]\
+![Alt Text](https://s8.gifyu.com/images/body46a0129b773b83ad.png)
+\
