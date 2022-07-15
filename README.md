@@ -65,7 +65,7 @@ ext    : [.mdl]\
 \
 plugin : ![](https://forum.xentax.com/viewtopic.php?f=16&t=25488#p185000) \
 game   : "Miami Vice - The Game (PSP)"\
-ext    : [.]\
-![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-04-23-14-47-807-1.gif)
+ext    : [ - ]\
+[Link to Xentax Topic](https://s8.gifyu.com/images/bandicam-2022-06-04-23-14-47-807-1.gif)
 \
 
