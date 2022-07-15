@@ -93,4 +93,9 @@ game   : "Liberation Maiden"\
 ext    : [.gm3]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-12-22-03-35-743-1.gif)
 \
+plugin : fmt_mef.py \
+game   : "Project IGI 1/2"\
+ext    : [.mef]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-04-22-22-58-29-844-1.gif)
+\
 
