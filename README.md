@@ -88,4 +88,9 @@ game   : "Madoka Magica (PSVita)"\
 ext    : [.mdl]\
 ![Alt Text](https://s8.gifyu.com/images/Madoka_Magika_PS_VITA-1.gif)
 \
+plugin : fmt_LiberationMaiden.py \
+game   : "Liberation Maiden"\
+ext    : [.gm3]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-05-12-22-03-35-743-1.gif)
+\
 
