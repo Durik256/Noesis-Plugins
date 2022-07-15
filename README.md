@@ -17,4 +17,9 @@ plugin : fmt_c3_3.py \
 game   : "Eudemons M"\
 ext    : [.c3]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-07-14-14-39-04-955-1.gif)
+plugin : fmt_FF1_MDL[XBOX].py \
+game   : "Ah My Goddess (PS2)"\
+ext    : [.BIN]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-07-14-14-39-04-955-1.gif)
 \
+
