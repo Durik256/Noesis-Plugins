@@ -20,6 +20,6 @@ ext    : [.c3]\
 plugin : fmt_FF1_MDL[XBOX].py \
 game   : "Ah My Goddess (PS2)"\
 ext    : [.BIN]\
-![Alt Text](https://s8.gifyu.com/images/bandicam-2022-07-14-14-39-04-955-1.gif)
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-07-11-17-23-39-071-1.gif)
 \
 
