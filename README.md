@@ -33,4 +33,9 @@ game   : "Aerial Strike: The Yager Missions"\
 ext    : [.ylm]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-28-01-02-53-826-1.gif)
 \
+plugin : fmt_yod.py \
+game   : "Aerial Strike: The Yager Missions"\
+ext    : [.yod]\
+![Alt Text](https://s8.gifyu.com/images/clideo_editor_fc674285238b4646ab438d62aa4621c4-1.gif)
+\
 
