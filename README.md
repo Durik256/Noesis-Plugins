@@ -38,4 +38,8 @@ game   : "Aerial Strike: The Yager Missions"\
 ext    : [.yod]\
 ![Alt Text](https://s8.gifyu.com/images/clideo_editor_fc674285238b4646ab438d62aa4621c4-1.gif)
 \
-
+plugin : fmt_model_5.py \
+game   : "Diablo Immortal"\
+ext    : [.model]\
+![Alt Text](https://s8.gifyu.com/images/bandicam-2022-06-19-00-33-36-882-1.gif)
+\
