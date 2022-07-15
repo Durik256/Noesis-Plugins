@@ -123,3 +123,8 @@ game   : "Team6"\
 ext    : [.dcm]\
 ![Alt Text](https://s8.gifyu.com/images/bandicam-2022-03-23-12-38-03-843.jpg)
 \
+plugin : fmt_tibberojVER.py \
+game   : "Bus Derby (iOS)"\
+ext    : [.obj]\
+![Alt Text](https://s8.gifyu.com/images/red5df3aa3ea1f7df48.png)
+\
