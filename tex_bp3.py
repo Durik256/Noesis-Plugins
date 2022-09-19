@@ -70,10 +70,12 @@ def LoadRGBA(data, texList):
         v24 = bitCount * chunkX // 8
         chunkPixel = b''
         if (bitCount > 0):
+            curPos = bs.getOffset()
             for cY in range(chunkY):
                 chunkPixel += bs.readBytes((bitCount * chunkX) // 8)
                 chunkPixel += b'\xFF'* (bitCount - (bitCount * chunkX) // 8)
             chunkPixel += b'\xFF'* ((bitCount * 8) - (len(chunkPixel)))
+            bs.seek(curPos + (bitCount*chunkX*chunkY)//8)
         
         v20 = 3 * wt
         v23 = 3 * wt * 8 * (i // (wt // 8))
