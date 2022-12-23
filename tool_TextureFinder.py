@@ -88,11 +88,12 @@ def LoadRGBA(data, texList):
             data = rapi.imageDecodeDXT(data, w, h, texFmt)
         elif pal:
             if mip:
-                bs.seek((w*h)//((pofs*2) if pofs else 1))
-                palette = bs.readBytes(bpp*128)
+                if pofs:
+                    bs.seek((w*h)//(pofs*2),1)
+                palette = bs.readBytes(raw*256//8)
             else:
                 bs.seek(pofs)
-                palette = bs.readBytes(bpp*128)
+                palette = bs.readBytes(raw*256//8)
         
             data = rapi.imageDecodeRawPal(data, palette, w, h, bpp, fmt, flg)
         else:
