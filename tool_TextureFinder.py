@@ -38,6 +38,7 @@ def LoadRGBA(data, texList):
         fmt  = arg[4]
         skw  = toInt(arg[5], 'skew')
         bits = parseFormat(fmt)
+        raw  = bits
         pal  = int(arg[6])
         pofs = toInt(arg[7])#or num MipMap
         bpp  = toInt(arg[8])
@@ -90,10 +91,15 @@ def LoadRGBA(data, texList):
             if mip:
                 if pofs:
                     bs.seek((w*h)//(pofs*2),1)
-                palette = bs.readBytes(raw*256//8)
             else:
                 bs.seek(pofs)
-                palette = bs.readBytes(raw*256//8)
+            
+            size, eof, add = int(-1 * (raw*256/8) // 1 * -1), bs.getSize() - bs.getOffset(), 0
+            if eof < size:
+                add = size - eof
+                size = eof
+            palette = bs.readBytes(size) + b'\x00'*add
+            print('size palette:',len(palette))
         
             data = rapi.imageDecodeRawPal(data, palette, w, h, bpp, fmt, flg)
         else:
