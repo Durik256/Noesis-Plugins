@@ -11,8 +11,7 @@ def registerNoesisTypes():
     noesis.setHandlerLoadRGBA(handle, LoadRGBA)
     noesis.setHandlerWriteRGBA(handle, WriteRGBA)
     return 1
-            
-Controls = []
+
 FilePath = ""
 
 def CheckType(data):
@@ -31,19 +30,19 @@ def LoadRGBA(data, texList):
     else:
         arg  = data.decode().split(';')
         ofs  = toInt(arg[1], 'offset')
-        w    = toInt(arg[2], 'width')
-        h    = toInt(arg[3], 'height')
-        fw   = int(arg[11])
-        fh   = int(arg[12])
-        fmt  = arg[4]
-        skw  = toInt(arg[5], 'skew')
+        w    = toInt(arg[4], 'width')
+        h    = toInt(arg[5], 'height')
+        fw   = int(arg[8])
+        fh   = int(arg[9])
+        fmt  = arg[6]
+        skw  = toInt(arg[2], 'skew')
         bits = parseFormat(fmt)
         raw  = bits
-        pal  = int(arg[6])
-        pofs = toInt(arg[7])#or num MipMap
-        bpp  = toInt(arg[8])
-        mip  = int(arg[9])
-        flg  = int(arg[10])
+        pal  = int(arg[10])
+        pofs = toInt(arg[3], 'palette ofsset /or/ num MipMap')
+        bpp  = toInt(arg[7], 'bpp')
+        mip  = int(arg[11])
+        flg  = int(arg[12])
         
         dxt, texFmt = False, noesis.NOESISTEX_DXT1
         if 'dxt' in fmt.lower():
@@ -108,6 +107,9 @@ def LoadRGBA(data, texList):
     if fw or fh:
         data = rapi.imageFlipRGBA32(data, w, h, fh, fw)
     
+    #if swizzle:
+    #   data = swizzle(data, w, h)
+    
     texList.append(NoeTexture(name, w, h, data, noesis.NOESISTEX_RGBA32))
     return 1
     
@@ -135,47 +137,35 @@ def WriteRGBA(data, w, h, writer):
     data = rapi.imageEncodeRaw(data, w, h, 'r8g8b8a8')
     writer.writeBytes(data)
     return 1
-    
-def TextureFinderProc(hWnd, message, wParam, lParam):
-    if message == noewin.WM_PAINT:
-        noeWnd = noewin.getNoeWndForHWnd(hWnd)
-        ps = noewin.PAINTSTRUCT()
-        rect = noewin.RECT()
-        hDC = noewin.user32.BeginPaint(hWnd, byref(ps))
-        oldFont = None
-        if noeWnd.hFont:
-            oldFont = noewin.gdi32.SelectObject(hDC, noeWnd.hFont)    
-        
-        if oldFont:
-            noewin.gdi32.SelectObject(hDC, oldFont)
-        return 0
-    return noewin.defaultWindowProc(hWnd, message, wParam, lParam)
  
 #---------------------------------------------------
-def dialogOpenFile(noeWnd, controlId, wParam, lParam):
+def dialogOpenFile(wind, controlId, wParam, lParam):
     FileName = noesis.userPrompt(noesis.NOEUSERVAL_FILEPATH, "Open File", "Select any File", noesis.getSelectedFile())
     global FilePath
     
-    Controls[0].setText('')
+    wind.userControls[18].setText('')
     FilePath = ''
     
     if FileName != None:
         FilePath = str(FileName)
-        Controls[0].setText(os.path.basename(FileName))
+        wind.userControls[18].setText(os.path.basename(FileName))
         
-def OpenTemp(noeWnd, controlId, wParam, lParam):
+def OpenTemp(wind, controlId, wParam, lParam):
     template = 'TEMP;'
     
-    for x in range(1,6):
-        template += str(Controls[x].getText().strip()) + ';'
+    for x in [0,4,9]:#textbox
+        template += str(wind.userControls[x].getText().strip()) + ';'
         
-    template += ('1' if Controls[6].isChecked() else '0') + ';'
+    for x in [1,2,3,10]:#combobox
+        x = wind.userControls[x]
+        l = noewin.user32.GetWindowTextLengthW(x.hWnd) + 1
+        textBuffer = noewin.create_unicode_buffer(l)
+        noewin.user32.GetWindowTextW(x.hWnd, textBuffer, l)
+        print(l,textBuffer.value)
+        template += textBuffer.value.strip() + ';'
         
-    for x in range(7,9):
-        template += str(noeWnd.getControlByIndex(Controls[x]).getText().strip()) + ';'
-        
-    for x in range(9,13):
-        template += ('1' if noeWnd.getControlByIndex(Controls[x]).isChecked() else '0') + ';'
+    for x in [5,6,7,8,11]:#checkbox
+        template += ('1' if wind.userControls[x].isChecked() else '0') + ';'
     
     if os.path.exists(FilePath):
         with open('temp_load.TextureFinder', 'w') as w:
@@ -185,91 +175,128 @@ def OpenTemp(noeWnd, controlId, wParam, lParam):
         print('Error file exists!', FilePath)
     print(template)
     
-def ChekedMethod(noeWnd, controlId, wParam, lParam):
-    checkBox = noeWnd.getControlById(controlId)
-    checkBox.setChecked(noewin.BST_CHECKED if checkBox.isChecked() == 0 else noewin.BST_UNCHECKED)
+def ChekedMethod(wind, id, wParam, lParam):
+    checkBox = wind.getControlById(id)
+    checkBox.setChecked(noewin.BST_UNCHECKED if checkBox.isChecked() else noewin.BST_CHECKED)
     
-    if checkBox == Controls[6]:
-        DisablePallete(noeWnd, False)
+    if checkBox == wind.userControls[7]:
+        DisablePallete(wind, False)
 
         if checkBox.isChecked():
-            DisablePallete(noeWnd, True)
+            DisablePallete(wind, True)
             
-    elif checkBox == noeWnd.getControlByIndex(Controls[9]):
-        noewin.user32.SetWindowTextW(Controls[-1].hWnd, "offset")
+    elif checkBox == wind.userControls[8]:
+        wind.userControls[9].setText('0')
+        noewin.user32.SetWindowTextW(wind.userControls[20].hWnd, "offset:")
         if checkBox.isChecked():
-            noewin.user32.SetWindowTextW(Controls[-1].hWnd, "mipMap:")
+            noewin.user32.SetWindowTextW(wind.userControls[20].hWnd, "mipMap:")
 
-def DisablePallete(noeWnd, enabled):
-    for x in range(7,11):
-        noeWnd.enableControlByIndex(Controls[x], enabled)
+def DisablePallete(wind, enabled):
+    for x in range(8,14):
+        noewin.user32.EnableWindow(wind.userControls[x].hWnd, enabled)
     
 def TextureFinderMethod(toolIndex):
     noesis.logPopup()
     
-    noeWnd = noewin.NoeUserWindow("TextureFinder by(Durik256)", "TextureFinderClass", 194, 277, TextureFinderProc)
-    #offset a bit into the noesis window
-    noeWindowRect = noewin.getNoesisWindowRect()
-    if noeWindowRect:
-        windowMargin = 64
-        noeWnd.x = noeWindowRect[0] + windowMargin
-        noeWnd.y = noeWindowRect[1] + windowMargin
-    if not noeWnd.createWindow():
+    wind = noewin.NoeUserWindow("TextureFinder by(Durik256)", "TextureFinderClass", 235, 316, noewin.defaultWindowProc)
+
+    rect = noewin.getNoesisWindowRect()
+    if rect:
+        wind.x = rect[0] + 64
+        wind.y = rect[1] + 64
+    if not wind.createWindow():
         print("Failed to create window.")
         return 0
 
-    noeWnd.setFont("Arial", 14)
+    wind.setFont("Arial", 14)
+    ctrl = wind.userControls
     
-    global Controls
-    noeWnd.createStatic("offset:", 10, 35, 58, 20)
-    noeWnd.createStatic("size:", 10, 60, 58, 20)
-    noeWnd.createStatic("x", 119, 61, 9, 20)
-    noeWnd.createStatic("format:", 10, 85, 58, 20)
-    noeWnd.createStatic("skew:", 10, 110, 58, 20)
-    label = noeWnd.createStatic("offset:", 10, 160, 58, 20)
-    noeWnd.createStatic("BPP:", 10, 185, 58, 20)
-    noeWnd.createStatic("flip:", 112, 111, 19, 20)
-    noeWnd.createStatic("x", 154, 111, 8, 20)
-        
-    noeWnd.createButton("...", 156, 9,   22, 22, dialogOpenFile)
-    noeWnd.createButton("run", 128, 215, 50, 22, OpenTemp)
+    wind.createEditBox(60, 40, 143, 20, text = '0', isMultiLine = False)                            #0-Offset
+    wind.createComboBox(60, 70, 70, 14, None, style = noewin.CBS_DROPDOWN | noewin.CBS_HASSTRINGS)  #1-width
+    wind.createComboBox(149, 70, 70, 14, None, style = noewin.CBS_DROPDOWN | noewin.CBS_HASSTRINGS) #2-height
+    wind.createComboBox(60, 100, 159, 20, None, style = noewin.CBS_DROPDOWN | noewin.CBS_HASSTRINGS)#3-format
+    wind.createEditBox(60, 134, 54, 20, text = '0', isMultiLine = False)                            #4-skew
+    wind.createCheckBox("x", 173, 132, 30, 24, ChekedMethod)                                        #5-flipX
+    wind.createCheckBox("", 203, 132, 16, 24, ChekedMethod)                                         #6-flipY
+    wind.createCheckBox("palette:", 10, 162, 90, 24, ChekedMethod)                                  #7-palette
+    wind.createCheckBox("mipMap", 140, 162, 90, 24, ChekedMethod)                                   #8-mipMap
+    wind.createEditBox(60, 192, 143, 20, text = '0', isMultiLine = False)                           #9-OffsetPallete
+    wind.createComboBox(60, 222, 70, 20, None, style = noewin.CBS_DROPDOWN | noewin.CBS_HASSTRINGS) #10-BBP
+    wind.createCheckBox("flag", 140, 221, 90, 24, ChekedMethod)                                     #11-flag
+    
+    #fix height comboBox
+    noewin.user32.SendMessageW(wind.userControls[1].hWnd, noewin.CB_SETITEMHEIGHT, -1, 14)
+    noewin.user32.SendMessageW(wind.userControls[2].hWnd, noewin.CB_SETITEMHEIGHT, -1, 14)
+    noewin.user32.SendMessageW(wind.userControls[10].hWnd, noewin.CB_SETITEMHEIGHT, -1, 14)
+    
+    #UpDownNumeric ▲▼▾▴
+    wind.createButton('▴', 203, 191, 16, 11, ChangeValue)#12 - pofs
+    wind.createButton('▾', 203, 202, 16, 11, ChangeValue)#13 - pofs
+    wind.createButton('▴', 114, 133, 16, 11, ChangeValue)#14 - skew
+    wind.createButton('▾', 114, 144, 16, 11, ChangeValue)#15 - skew
+    wind.createButton('▴', 203, 39, 16, 11, ChangeValue)#16 - gofs
+    wind.createButton('▾', 203, 50, 16, 11, ChangeValue)#17 - gofs
 
-    field = noeWnd.createEditBox(10,  10,  146, 20, "", None, False, False)        #file
-    Controls.append(noeWnd.getControlByIndex(field))                               #0
-    field = noeWnd.createEditBox(68,  35,  110, 20, "0", None, False, False)       #offset
-    Controls.append(noeWnd.getControlByIndex(field))                               #1
-    field = noeWnd.createEditBox(68,  60,  50,  20, "512", None, False, False)     #sizeW
-    Controls.append(noeWnd.getControlByIndex(field))                               #2
-    field = noeWnd.createEditBox(128, 60,  50,  20, "512", None, False, False)     #sizeH
-    Controls.append(noeWnd.getControlByIndex(field))                               #3
-    field = noeWnd.createEditBox(68,  85,  110, 20, "r8g8b8a8", None, False, False)#format
-    Controls.append(noeWnd.getControlByIndex(field))                               #4
-    field = noeWnd.createEditBox(68,  110, 39,  20, "0", None, False, False)       #skew
-    Controls.append(noeWnd.getControlByIndex(field))                               #5
-    field = noeWnd.createCheckBox("palette:", 10, 135, 90, 24, ChekedMethod)       #CheckBox palette
-    Controls.append(noeWnd.getControlByIndex(field))                               #6
-    field = noeWnd.createEditBox(68,  160, 110, 20, "0", None, False, False)       #offset palette
-    Controls.append(field)                                                         #7
-    field = noeWnd.createEditBox(68,  185, 50,  20, "8", None, False, False)       #BPP
-    Controls.append(field)                                                         #8
-    field = noeWnd.createCheckBox("MipMap", 102, 135, 80, 24, ChekedMethod)        #CheckBox MipMap
-    Controls.append(field)                                                         #9
-    field = noeWnd.createCheckBox("Flag", 129, 183, 50, 24, ChekedMethod)          #CheckBox Flag
-    Controls.append(field)                                                         #10
-    field = noeWnd.createCheckBox("", 136, 108, 16, 24, ChekedMethod)              #CheckBox Flip Horizontal
-    Controls.append(field)                                                         #11
-    field = noeWnd.createCheckBox("", 163, 108, 16, 24, ChekedMethod)              #CheckBox Flip Vertical
-    Controls.append(field)                                                         #12
+    wind.createEditBox(10, 10, 188, 20, isMultiLine = False)#18 - field file
+    wind.createButton("...", 198, 9, 22, 22, dialogOpenFile)#19
     
-    #TEST COMBOBOX
-    field = noeWnd.getControlByIndex(noeWnd.createComboBox(194, 60, 60, 14, None, style = 0x0003))
-    noewin.user32.SendMessageW(field.hWnd, 0x0153, -1, 14)
+    #static
+    wind.createStatic("offset:", 10, 192, 40, 20)#20
+    wind.createStatic("offset:", 10, 41, 40, 20)
+    wind.createStatic("size:", 10, 71, 40, 20)
+    wind.createStatic("x", 136, 71, 10, 20)
+    wind.createStatic("format:", 10, 101, 45, 20)
+    wind.createStatic("skew:", 10, 135, 45, 20)
+    wind.createStatic("flip:", 140, 135, 45, 20)
+    wind.createStatic("BPP:", 10, 224, 40, 20)
+    
+    wind.createButton("run", 170, 251, 50, 22, OpenTemp)
+    
+    #add items in combobox
     i = 2048
     for x in range(12):
-        field.addString(str(i))
+        wind.userControls[1].addString(str(i))
+        wind.userControls[2].addString(str(i))
         i //=2
-    field.selectString('512')
+    wind.userControls[1].selectString('512')
+    wind.userControls[2].selectString('512')
     
-    Controls.append(noeWnd.getControlByIndex(label))                                                        #always in the End
-    DisablePallete(noeWnd, False)
+    formats = ['r16g16b16a16', 'r16g16b16',
+               'r8g8b8a8'    , 'r8g8b8',
+               'r5g6b5'      , 'r5g5b5a1',
+               'r4g4b4a4'    , 'r3g3b2',
+               'r2g2b2a2'    , 'DXT1',
+               'DXT3'        , 'DXT5']
+    
+    for x in formats:
+        wind.userControls[3].addString(x)
+    wind.userControls[3].selectString('r8g8b8a8')
+    
+    wind.userControls[10].addString('4')
+    wind.userControls[10].addString('8')
+    wind.userControls[10].selectString('8')
+    
+    DisablePallete(wind, False)
     return 0
+
+#UpDownNumerick change value
+def calc(id, i, wind):
+    s = ''.join(c for c in '0'+wind.userControls[id].getText() if c.isdigit())
+    s = int(s) + (i)
+    if s < 0: s = 0
+    wind.userControls[id].setText(str(s))
+   
+def ChangeValue(wind, id, wParam, lParam):
+    btn = wind.getControlById(id)
+    if btn == wind.userControls[12]:#12 - pofs
+        calc(9, 1, wind)
+    elif btn == wind.userControls[13]:#13 - pofs
+        calc(9, -1, wind)
+    elif btn == wind.userControls[14]:#14 - skew
+        calc(4, 1, wind)
+    elif btn == wind.userControls[15]:#15 - skew
+        calc(4, -1, wind)
+    elif btn == wind.userControls[16]:#16 - gofs
+        calc(0, 1, wind)
+    elif btn == wind.userControls[17]:#17 - gofs
+        calc(0, -1, wind)
