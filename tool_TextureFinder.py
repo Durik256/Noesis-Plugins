@@ -161,7 +161,6 @@ def OpenTemp(wind, controlId, wParam, lParam):
         l = noewin.user32.GetWindowTextLengthW(x.hWnd) + 1
         textBuffer = noewin.create_unicode_buffer(l)
         noewin.user32.GetWindowTextW(x.hWnd, textBuffer, l)
-        print(l,textBuffer.value)
         template += textBuffer.value.strip() + ';'
         
     for x in [5,6,7,8,11]:#checkbox
