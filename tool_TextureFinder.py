@@ -31,7 +31,10 @@ def LoadRGBA(data, texList):
         arg  = data.decode().split(';')
         ofs  = toInt(arg[1], 'offset')
         w    = toInt(arg[4], 'width')
-        h    = toInt(arg[5], 'height')
+        if arg[5] == 'max': 
+            h = 2**32
+        else:
+            h = toInt(arg[5], 'height')
         fw   = int(arg[8])
         fh   = int(arg[9])
         fmt  = arg[6]
@@ -68,7 +71,14 @@ def LoadRGBA(data, texList):
         
         bs = NoeBitStream(rapi.loadIntoByteArray(FilePath))
         bs.seek(ofs)
-        size, eof, add = int(-1 * (w*h*bits/8 + (skw*h*8)) // 1 * -1), bs.getSize() - ofs, 0
+        
+        max = ceil((bs.getSize() - ofs)/(w*bits/8))
+        if dxt: max = max//4*4
+        print("max:",max)
+        if h > max:
+            h = max
+        
+        size, eof, add = ceil(w*h*bits/8 + (skw*h*8)), bs.getSize() - ofs, 0
         if eof < size:
             add = size - eof
             size = eof
@@ -80,7 +90,7 @@ def LoadRGBA(data, texList):
         else:
             data = b''
             for y in range(h):
-                data += bs.readBytes(int(-1 * ((w*bits)/8) // 1 * -1))
+                data += bs.readBytes(ceil(w*bits/8))
                 bs.seek(skw,1)
             data += b'\xFF'*add
         
@@ -93,11 +103,11 @@ def LoadRGBA(data, texList):
             else:
                 bs.seek(pofs)
             
-            size, eof, add = int(-1 * (raw*256/8) // 1 * -1), bs.getSize() - bs.getOffset(), 0
+            size, eof, add = ceil(raw*256/8), bs.getSize() - bs.getOffset(), 0
             if eof < size:
                 add = size - eof
                 size = eof
-            palette = bs.readBytes(size) + b'\x00'*add
+            palette = bs.readBytes(size) + b'\xFF'*add
             print('size palette:',len(palette))
         
             data = rapi.imageDecodeRawPal(data, palette, w, h, bpp, fmt, flg)
@@ -112,6 +122,9 @@ def LoadRGBA(data, texList):
     
     texList.append(NoeTexture(name, w, h, data, noesis.NOESISTEX_RGBA32))
     return 1
+    
+def ceil(i):
+    return int(-1 * (i) // 1 * -1)
     
 def parseFormat(fmt):
     try:
@@ -149,8 +162,9 @@ def dialogOpenFile(wind, controlId, wParam, lParam):
     if FileName != None:
         FilePath = str(FileName)
         wind.userControls[18].setText(os.path.basename(FileName))
+        OpenTemp(wind, id, wParam, lParam)
         
-def OpenTemp(wind, controlId, wParam, lParam):
+def OpenTemp(wind, id, wParam, lParam):
     template = 'TEMP;'
     
     for x in [0,4,9]:#textbox
@@ -257,6 +271,7 @@ def TextureFinderMethod(toolIndex):
         wind.userControls[1].addString(str(i))
         wind.userControls[2].addString(str(i))
         i //=2
+    wind.userControls[2].addString('max')
     wind.userControls[1].selectString('512')
     wind.userControls[2].selectString('512')
     
@@ -287,15 +302,16 @@ def calc(id, i, wind):
    
 def ChangeValue(wind, id, wParam, lParam):
     btn = wind.getControlById(id)
-    if btn == wind.userControls[12]:#12 - pofs
+    if btn == wind.userControls[12]:#12 - pofsUp
         calc(9, 1, wind)
-    elif btn == wind.userControls[13]:#13 - pofs
+    elif btn == wind.userControls[13]:#13 - pofsDown
         calc(9, -1, wind)
-    elif btn == wind.userControls[14]:#14 - skew
+    elif btn == wind.userControls[14]:#14 - skewUp
         calc(4, 1, wind)
-    elif btn == wind.userControls[15]:#15 - skew
+    elif btn == wind.userControls[15]:#15 - skewDown
         calc(4, -1, wind)
-    elif btn == wind.userControls[16]:#16 - gofs
+    elif btn == wind.userControls[16]:#16 - gofsUp
         calc(0, 1, wind)
-    elif btn == wind.userControls[17]:#17 - gofs
+    elif btn == wind.userControls[17]:#17 - gofsDown
         calc(0, -1, wind)
+    OpenTemp(wind, id, wParam, lParam)
