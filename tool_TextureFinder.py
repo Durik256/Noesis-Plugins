@@ -69,57 +69,59 @@ def LoadRGBA(data, texList):
         if pal:
             print('palette offset /or/ mipmap:',pofs,'\nbpp: ', bpp,'\nflag:',flg)
         
-        bs = NoeBitStream(rapi.loadIntoByteArray(FilePath))
-        bs.seek(ofs)
+        with open(FilePath,'rb') as f:
+            bs = NoeFileStream(f)
+            bs.seek(ofs)
         
-        max = ceil((bs.getSize() - ofs)/(w*bits/8))
-        if dxt: max = max//4*4
-        print("max:",max)
-        if h > max:
-            h = max
+            max = ceil((bs.fileSize - ofs)/(w*bits/8))
+            if dxt: max = max//4*4
         
-        size, eof, add = ceil(w*h*bits/8 + (skw*h*8)), bs.getSize() - ofs, 0
-        if eof < size:
-            add = size - eof
-            size = eof
-        
-        print('size file:',bs.getSize(),'\nsize on prewiev:',size+add)
-        
-        if not skw:
-            data = bs.readBytes(size) + b'\xFF'*add
-        else:
-            data = b''
-            for y in range(h):
-                data += bs.readBytes(ceil(w*bits/8))
-                bs.seek(skw,1)
-            data += b'\xFF'*add
-        
-        if dxt:
-            data = rapi.imageDecodeDXT(data, w, h, texFmt)
-        elif pal:
-            if mip:
-                if pofs:
-                    bs.seek((w*h)//(pofs*2),1)
-            else:
-                bs.seek(pofs)
+            print("max:",max)
+            if h > max:
+                h = max
             
-            size, eof, add = ceil(raw*256/8), bs.getSize() - bs.getOffset(), 0
+            size, eof, add = ceil(w*h*bits/8 + (skw*h*8)), bs.fileSize - ofs, 0
             if eof < size:
                 add = size - eof
                 size = eof
-            palette = bs.readBytes(size) + b'\xFF'*add
-            print('size palette:',len(palette))
+            
+            print('size file:',bs.fileSize,'\nsize on prewiev:',size+add)
+            
+            if not skw:
+                data = bs.readBytes(size) + b'\xFF'*add
+            else:
+                data = b''
+                for y in range(h):
+                    data += bs.readBytes(ceil(w*bits/8))
+                    bs.seek(skw,1)
+                data += b'\xFF'*add
+            
+            if dxt:
+                data = rapi.imageDecodeDXT(data, w, h, texFmt)
+            elif pal:
+                if mip:
+                    if pofs:
+                        bs.seek((w*h)//(pofs*2),1)
+                else:
+                    bs.seek(pofs)
+                
+                size, eof, add = ceil(raw*256/8), bs.fileSize - bs.tell(), 0
+                if eof < size:
+                    add = size - eof
+                    size = eof
+                palette = bs.readBytes(size) + b'\xFF'*add
+                print('size palette:',len(palette))
+            
+                data = rapi.imageDecodeRawPal(data, palette, w, h, bpp, fmt, flg)
+            else:
+                data = rapi.imageDecodeRaw(data, w, h, fmt)
         
-            data = rapi.imageDecodeRawPal(data, palette, w, h, bpp, fmt, flg)
-        else:
-            data = rapi.imageDecodeRaw(data, w, h, fmt)
-    
-    if fw or fh:
-        data = rapi.imageFlipRGBA32(data, w, h, fh, fw)
-    
-    #if swizzle:
-    #   data = swizzle(data, w, h)
-    
+        if fw or fh:
+            data = rapi.imageFlipRGBA32(data, w, h, fh, fw)
+        
+        #if swizzle:
+        #   data = swizzle(data, w, h)
+        
     texList.append(NoeTexture(name, w, h, data, noesis.NOESISTEX_RGBA32))
     return 1
     
