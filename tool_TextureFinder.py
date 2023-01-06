@@ -35,17 +35,19 @@ def LoadRGBA(data, texList):
             h = 2**32
         else:
             h = toInt(arg[5], 'height')
-        fw   = int(arg[8])
-        fh   = int(arg[9])
+        fw   = int(arg[9])#9
+        fh   = int(arg[10])#10
         fmt  = arg[6]
         skw  = toInt(arg[2], 'skew')
         bits = parseFormat(fmt)
         raw  = bits
-        pal  = int(arg[10])
+        pal  = int(arg[11])#11
         pofs = toInt(arg[3], 'palette ofsset /or/ num MipMap')
         bpp  = toInt(arg[7], 'bpp')
-        mip  = int(arg[11])
-        flg  = int(arg[12])
+        mip  = int(arg[12])#12
+        flg  = int(arg[13])#13
+        swzl = int(arg[14])
+        pstp = arg[8]
         
         dxt, texFmt = False, noesis.NOESISTEX_DXT1
         if 'dxt' in fmt.lower():
@@ -111,7 +113,12 @@ def LoadRGBA(data, texList):
                     size = eof
                 palette = bs.readBytes(size) + b'\xFF'*add
                 print('size palette:',len(palette))
-            
+                
+                if swzl:
+                    if pstp == 'PSP':
+                        data = rapi.imageUntwiddlePSP(data, w, h, bpp)
+                    elif pstp == 'PS2':
+                        data = rapi.imageUntwiddlePS2(data, w, h, bpp)
                 data = rapi.imageDecodeRawPal(data, palette, w, h, bpp, fmt, flg)
             else:
                 data = rapi.imageDecodeRaw(data, w, h, fmt)
@@ -120,11 +127,34 @@ def LoadRGBA(data, texList):
             data = rapi.imageFlipRGBA32(data, w, h, fh, fw)
         
         #if swizzle:
-        #   data = swizzle(data, w, h)
+        
         
     texList.append(NoeTexture(name, w, h, data, noesis.NOESISTEX_RGBA32))
     return 1
-    
+
+def swizzle():
+    dest = [width * height]
+
+    destOffset = 0;
+
+    # Incorporate the bpp into the width
+    width = (width * 8) >> 3;
+
+    rowblocks = (width / 16);
+
+    for y in range(height):
+        for x in range(width):
+            blockX = x / 16
+            blockY = y / 8
+
+            blockIndex = blockX + ((blockY) * rowblocks)
+            blockAddress = blockIndex * 16 * 8
+
+            dest[destOffset] = data[blockAddress + (x - blockX * 16) + ((y - blockY * 8) * 16)]
+            destOffset+=1
+    # ---- end unswizzling code ---- \\
+
+
 def ceil(i):
     return int(-1 * (i) // 1 * -1)
     
@@ -172,14 +202,14 @@ def OpenTemp(wind, id, wParam, lParam):
     for x in [0,4,9]:#textbox
         template += str(wind.userControls[x].getText().strip()) + ';'
         
-    for x in [1,2,3,10]:#combobox
+    for x in [1,2,3,10,30]:#combobox
         x = wind.userControls[x]
         l = noewin.user32.GetWindowTextLengthW(x.hWnd) + 1
         textBuffer = noewin.create_unicode_buffer(l)
         noewin.user32.GetWindowTextW(x.hWnd, textBuffer, l)
         template += textBuffer.value.strip() + ';'
         
-    for x in [5,6,7,8,11]:#checkbox
+    for x in [5,6,7,8,11,29]:#checkbox
         template += ('1' if wind.userControls[x].isChecked() else '0') + ';'
     
     if os.path.exists(FilePath):
@@ -207,7 +237,7 @@ def ChekedMethod(wind, id, wParam, lParam):
             noewin.user32.SetWindowTextW(wind.userControls[20].hWnd, "mipMap:")
 
 def DisablePallete(wind, enabled):
-    for x in range(8,14):
+    for x in [8,9,10,11,12,13,29,30]:#range(8,14)
         noewin.user32.EnableWindow(wind.userControls[x].hWnd, enabled)
     
 def TextureFinderMethod(toolIndex):
@@ -257,15 +287,23 @@ def TextureFinderMethod(toolIndex):
     
     #static
     wind.createStatic("offset:", 10, 192, 40, 20)#20
-    wind.createStatic("offset:", 10, 41, 40, 20)
-    wind.createStatic("size:", 10, 71, 40, 20)
-    wind.createStatic("x", 136, 71, 10, 20)
-    wind.createStatic("format:", 10, 101, 45, 20)
-    wind.createStatic("skew:", 10, 135, 45, 20)
-    wind.createStatic("flip:", 140, 135, 45, 20)
-    wind.createStatic("BPP:", 10, 224, 40, 20)
+    wind.createStatic("offset:", 10, 41, 40, 20)#21
+    wind.createStatic("size:", 10, 71, 40, 20)#22
+    wind.createStatic("x", 136, 71, 10, 20)#23
+    wind.createStatic("format:", 10, 101, 45, 20)#24
+    wind.createStatic("skew:", 10, 135, 45, 20)#25
+    wind.createStatic("flip:", 140, 135, 45, 20)#26
+    wind.createStatic("BPP:", 10, 224, 40, 20)#27
     
-    wind.createButton("run", 170, 251, 50, 22, OpenTemp)
+    wind.createButton("run", 170, 251, 50, 22, OpenTemp)#28
+    
+    #add Swizzle
+    wind.createCheckBox("swizzle", 10, 249, 65, 24, ChekedMethod)   #29-swizzle
+    wind.createComboBox(75, 251, 55, 20, None, style = noewin.CBS_DROPDOWNLIST | noewin.CBS_HASSTRINGS)#30
+    noewin.user32.SendMessageW(wind.userControls[30].hWnd, noewin.CB_SETITEMHEIGHT, -1, 14)
+    wind.userControls[30].addString('PSP')
+    wind.userControls[30].addString('PS2')
+    wind.userControls[30].selectString('PSP')
     
     #add items in combobox
     i = 2048
