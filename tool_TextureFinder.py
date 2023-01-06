@@ -1,4 +1,12 @@
 #by Durik256
+'''
+install:
+Download Noesis
+Download this script or copy as txt and rename to "tool_TextureFinder.py
+Drop this script to '..\Noesis\Plugins\Python'
+Tools>Display Plugin Tools (once)
+Tools>Texture Finder
+'''
 from inc_noesis import *
 import os
 from ctypes import *
