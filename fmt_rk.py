@@ -1,140 +1,97 @@
-#powered by Durik256 19.01.2022 for xentax.com
 from inc_noesis import *
 
 def registerNoesisTypes():
-    handle = noesis.register("Ice Age", ".rk")
+    handle = noesis.register("My Little Pony Gameloft", ".rk")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
     noesis.logPopup()
     return 1
     
 def noepyCheckType(data):
-    if len(data) < 0x80:
-        return 0
-    bs = NoeBitStream(data)
-    Tag = noeAsciiFromBytes(bs.readBytes(8))
-    if Tag != 'RKFORMAT':
+    if data[:8] != b'RKFORMAT':
         return 0
     return 1
     
 def noepyLoadModel(data, mdlList):
     bs = NoeBitStream(data)
-    header = bs.readInt64()
-    ver = bs.readInt64()
-    master = noeAsciiFromBytes(bs.readBytes(64))
-    #vertex info
-    v_unk = bs.readInt()
-    v_offset = bs.readInt()
-    v_count = bs.readInt()
-    v_size = bs.readInt()
-    #face info
-    f_unk = bs.readInt()
-    f_offset = bs.readInt()
-    f_count = bs.readInt()
-    f_size = bs.readInt()
-    #bone info
-    bs.seek(0x50, NOESEEK_REL)
-    b_unk = bs.readInt()
-    b_offset = bs.readInt()
-    b_count = bs.readInt()
-    b_size = bs.readInt()
-    #weight info
-    bs.seek(0x80, NOESEEK_REL)
-    w_unk = bs.readInt()
-    w_offset = bs.readInt()
-    w_count = bs.readInt()
-    w_size = bs.readInt()
+    ctx = rapi.rpgCreateContext()
+    bs.seek(80)
     
-    #bones read
+    h = {}
+    #h = bs.read('68I')
+
+    for x in range(17):
+        i = bs.read('4I')
+        h[i[0]] = i[1:]
+            
+    bs.seek(h[2][0])
+    tn = string(bs)
+    m, tx = [NoeMaterial(tn, tn)], []
+    loadTx(tn, tx)
+    
+    #attr - (type,ofs,size)
+    bs.seek(h[13][0])
+    uo = -1
+    for x in range(h[13][1]):
+        i = bs.read('H2B')
+        if i[0] == 1030:
+            uo = i[1]
+    
+    bs.seek(h[3][0])
+    strd = h[3][2]//h[3][1]
+    vbuf = bs.read(h[3][2])
+    rapi.rpgSetMaterial(m[0].name)
+    rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, strd)
+    if uo != -1:
+        rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, strd, uo)
+    rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
+    
     bones = []
-    bs.seek(b_offset, NOESEEK_ABS)
-    for x in range(b_count):
-        parent = bs.readInt()
-        id = bs.readInt()
-        child = bs.readInt()
-        mat = NoeMat44.fromBytes(bs.readBytes(64)).toMat43()
-        name = noeAsciiFromBytes(bs.readBytes(64)).strip()
-        bones.append(NoeBone(id,name,mat,None,parent))
-    
-    #weight read
-    weight = []
-    bs.seek(w_offset, NOESEEK_ABS)
-    for x in range(w_count):
-        boneID = [bs.readUByte() for b in range(4)]
-        boneW = [bs.readUByte()/255 for b in range(4)]
-        weight.append(NoeVertWeight(boneID,boneW))
+    if h[7][1]:
+        bs.seek(h[7][0])
+        for x in range(h[7][1]):
+            prnt = bs.readInt()
+            indx = bs.readInt()
+            chld = bs.readInt()
+            matx = NoeMat44.fromBytes(bs.read(64)).toMat43()
+            name = string(bs)
+            bones.append(NoeBone(indx, name, matx, None, prnt))
+            
+        bs.seek(h[17][0])
+        wbuf = bs.read(h[17][2])
+        strd = h[17][2]//h[17][1]
+        rapi.rpgBindBoneIndexBuffer(wbuf, noesis.RPGEODATA_UBYTE, strd, 2)
+        rapi.rpgBindBoneWeightBufferOfs(wbuf, noesis.RPGEODATA_USHORT, strd, 4, 2)
         
-    #face read
-    face = []
-    bs.seek(f_offset, NOESEEK_ABS)
-    face += [bs.readShort() for x in range(f_count)]
+    bs.seek(h[4][0])
+    ibuf = bs.read(h[4][2])
+    rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, h[4][1], noesis.RPGEO_TRIANGLE)
     
-    #vertex/uv read
-    vert, uv = [], []
-    bs.seek(v_offset, NOESEEK_ABS)
-    for x in range(v_count):
-        vert.append(NoeVec3.fromBytes(bs.readBytes(12)))
-        #print(x,"ver",vert[-1])
-        bs.seek(12, NOESEEK_REL)
-        uv.append(NoeVec3([bs.readShort()/32768, bs.readShort()/32768]+[0]))
-    
-    #open 1 anim
-    animList = []
-    animPath =  os.path.join(rapi.getDirForFilePath(rapi.getInputName()),"a_sid_run_01.anim")
-    with open(animPath, "rb") as animStream:
-        animList.append(LoadAnim(animStream.read(),bones))
-    #end open 1 anim
-    """
-    #open all anim from dir
-    animDir =  rapi.getDirForFilePath(rapi.getInputName())
-    animPaths = []
-    for root, dirs, files in os.walk(animDir):
-        for fileName in files:
-            lowerName = fileName.lower()
-            if lowerName.endswith(".anim"):
-                fullPath = os.path.join(root, fileName)
-                animPaths.append(fullPath)
-    for animPath in animPaths:
-        with open(animPath, "rb") as animStream:
-            animList.append(LoadAnim(animStream.read(),bones))
-    """
-    
-    mesh = NoeMesh(face, vert , "mesh_0")
-    mesh.setUVs(uv)
-    mesh.setWeights(weight)
-    mdl = NoeModel([mesh])
+    rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)
+    mdl = rapi.rpgConstructModel()  
+    mdl.setModelMaterials(NoeModelMaterials(tx, m))
     mdl.setBones(bones)
-    #mdl.setAnims(animList)
-    mdl.setModelMaterials(NoeModelMaterials([], [NoeMaterial("default","")]))
     mdlList.append(mdl)
+    rapi.setPreviewOption("setAngOfs", "0 -90 -90")
     return 1
     
-def LoadAnim(data,bones):    
-    bs = NoeBitStream(data)
+def string(bs):
+    return bs.read(64).split(b'\x00')[0].decode()
     
-    header = bs.readInt64()
-    ver = bs.readInt64()
-    name = noeAsciiFromBytes(bs.readBytes(64))
-    #anim info
-    bone_count = bs.readInt()
-    frame_count = bs.readInt()
-    unk = bs.readInt()#alweys 4
-    framerate = bs.readInt()#?
-    
-    frame_matrix = []
-    if bone_count > len(bones):
-        return NoeAnim(name, bones, 1, [NoeMat43()]*len(bones), 1)
-    
-    for f in range(frame_count):
-        for x in range(bone_count):
-            pos = NoeVec3([bs.readShort()/32 for y in range(3)])
-            unk = bs.readUByte()#/255#scale???
-            mat = NoeQuat([bs.readByte()/127 for y in range(4)])
-            mat = mat.toMat43()
-            mat[3] = pos
-            
-            frame_matrix.append(mat)
-    
-    anim = NoeAnim(name, bones, frame_count, frame_matrix, framerate)
-    print(len(frame_matrix))
-    return anim
+def loadTx(tn, tx):
+    print(tn, tx)
+    try:
+        data = rapi.loadIntoByteArray(rapi.getDirForFilePath(rapi.getInputName())+tn+'.pvr')
+        hd = struct.unpack('8I', data[:32])
+        w, h, t = hd[6], hd[7], hd[2]
+
+        if t == 34:
+            data = rapi.imageDecodeASTC(data[67:], 8, 8, 1, w, h, 1)
+        elif t == 6:
+            data = rapi.imageDecodeETC(data[52:], w, h, 'RGB')
+        else:
+            return 0
+        
+        tx.append(NoeTexture(tn, w, h, data, noesis.NOESISTEX_RGBA32))
+    except:
+        print('error load tx!')
