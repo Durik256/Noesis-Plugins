@@ -67,7 +67,7 @@ def noepyLoadModel(data, mdlList):
     ibuf = bs.read(h[4][2])
     rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, h[4][1], noesis.RPGEO_TRIANGLE)
     
-    rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)
+    rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)#delete for Ice Age
     mdl = rapi.rpgConstructModel()  
     mdl.setModelMaterials(NoeModelMaterials(tx, m))
     mdl.setBones(bones)
