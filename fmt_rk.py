@@ -1,10 +1,10 @@
 from inc_noesis import *
 
 def registerNoesisTypes():
-    handle = noesis.register("My Little Pony Gameloft", ".rk")
+    handle = noesis.register("My Little Pony Gameloft", ".rk")#and Ice Age Adventures  
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    noesis.logPopup()
+    #noesis.logPopup()
     return 1
     
 def noepyCheckType(data):
@@ -72,7 +72,7 @@ def noepyLoadModel(data, mdlList):
     mdl.setModelMaterials(NoeModelMaterials(tx, m))
     mdl.setBones(bones)
     mdlList.append(mdl)
-    rapi.setPreviewOption("setAngOfs", "0 -90 -90")
+    rapi.setPreviewOption("setAngOfs", "0 -90 -90")#delete for Ice Age
     return 1
     
 def string(bs):
