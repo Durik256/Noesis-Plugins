@@ -4,7 +4,7 @@ def registerNoesisTypes():
     handle = noesis.register("My Little Pony Gameloft", ".rk")#and Ice Age Adventures  
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    #noesis.logPopup()
+    #noesis.logPopup()#debug
     return 1
     
 def noepyCheckType(data):
