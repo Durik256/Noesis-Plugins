@@ -44,7 +44,7 @@ def noepyLoadModel(data, mdlList):
     rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, strd)
     if uo != -1:
         rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, strd, uo)
-    rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
+        rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
     
     bones = []
     if h[7][1]:
