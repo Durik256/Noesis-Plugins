@@ -18,6 +18,8 @@ def LoadRGBA(data, texList):
     while bs.tell() < bs.getSize():
         size = bs.readUInt() - 4
         dest = bs.read('I')[0]
+        if bs.tell() >= bs.getSize():
+            break
         data = rapi.decompLZ4(bs.read(size), dest)
         
         tx = rapi.loadTexByHandler(data, '.pkm')
