@@ -245,7 +245,7 @@ def ChekedMethod(wind, id, wParam, lParam):
             noewin.user32.SetWindowTextW(wind.userControls[20].hWnd, "mipMap:")
 
 def DisablePallete(wind, enabled):
-    for x in [8,9,10,11,12,13,29,30]:#range(8,14)
+    for x in [8,9,10,11,12,13]:#29,30-swizzle; range(8,14)
         noewin.user32.EnableWindow(wind.userControls[x].hWnd, enabled)
     
 def TextureFinderMethod(toolIndex):
