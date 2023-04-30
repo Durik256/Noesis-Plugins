@@ -18,7 +18,7 @@ def LoadModel(data, mdlList):
 
     result = [i for i in findall(b'PMOC', data)]
 
-    for x in result[:1]:
+    for x in result:
         #PMOC
         bs.seek(x+8)
         name = noeStrFromBytes(bs.read(32))
