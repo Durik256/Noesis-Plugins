@@ -58,6 +58,7 @@ def LoadModel(data, mdlList):
         
         bs.seek(curPos)
             
+    rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)
     mdl = rapi.rpgConstructModel()#
     mdl.setBones(bones)
     mdlList.append(mdl)
