@@ -31,7 +31,7 @@ def LoadRGBA(data, texList):
         elif type == 11:
             fmt = noesis.NOESISTEX_DXT5
             print('offset:',bs.tell(), 'width:',w, 'height:',h, 'format: DXT5')
-            data = bs.read(w*h*4)
+            data = bs.read(w*h)
 
         data = rapi.imageDecodeDXT(data, w, h, fmt)
         texList.append(NoeTexture(rapi.getInputName(), w, h, data, noesis.NOESISTEX_RGBA32))    
