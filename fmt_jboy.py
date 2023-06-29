@@ -65,7 +65,8 @@ def LoadModel(data, mdlList):
         rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, stride)
         rapi.rpgBindUV1Buffer(uvbuf, noesis.RPGEODATA_FLOAT, 8)
         rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, len(ibuf)//2, noesis.RPGEO_TRIANGLE_STRIP)
-    
+
+    rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)
     mdl = rapi.rpgConstructModel()
     mdl.setModelMaterials(NoeModelMaterials([], materials))
     mdlList.append(mdl)
