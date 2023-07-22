@@ -23,13 +23,21 @@ def noepyLoadModel(data, mdlList):
         ibuf_ofs, vbuf_ofs = bs.read('2I')
         bs.seek(x+48)
         vofs,vnum,iofs,inum = bs.read('4I')
+        bs.seek(x+68)
+        unk0, unk1 = bs.read('2I')
         
         bs.seek(ibuf_ofs+80)
         ibuf = bs.read(inum*2)
         
         bs.seek(vbuf_ofs+80)
         vbuf = bs.read(vnum*12)
-        bs.seek(vbuf_ofs+80+(vnum*20))
+        skip = 0
+        if unk0 == 2305: 
+            skip += 1
+        if unk1 == 513:
+            skip += 1
+        
+        bs.seek(vbuf_ofs+80+(vnum*(12+(skip*4))))
         uvbuf = bs.read(vnum*8)
         
         rapi.rpgSetName('mesh_%i'%x)
