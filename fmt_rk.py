@@ -35,12 +35,8 @@ def noepyLoadModel(data, mdlList):
     for x in range(h[13][1]):
         i = bs.read('H2B')
         if i[0] == 1030:
-            uo, ufmt = i[1], noesis.RPGEODATA_USHORT
-            rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
-        elif i[0] == 1026:
-            uo, ufmt = i[1], noesis.RPGEODATA_FLOAT
-            rapi.rpgSetUVScaleBias(None, None)
-    
+            uo = i[1]
+
     bs.seek(h[3][0])
     strd = h[3][2]//h[3][1]
     vbuf = bs.read(h[3][2])
@@ -48,8 +44,9 @@ def noepyLoadModel(data, mdlList):
     rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, strd)
     print('uo:',uo)
     if uo != -1:
-        rapi.rpgBindUV1BufferOfs(vbuf, ufmt, strd, uo)
-
+        rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, strd, uo)
+    rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
+    
     bones = []
     if h[7][1]:
         bs.seek(h[7][0])
@@ -69,11 +66,8 @@ def noepyLoadModel(data, mdlList):
         
     bs.seek(h[4][0])
     ibuf = bs.read(h[4][2])
-    ifmt = noesis.RPGEODATA_USHORT
-    if h[3][2] > 65535:
-        ifmt = noesis.RPGEODATA_UINT
-    
-    rapi.rpgCommitTriangles(ibuf, ifmt, h[4][1], noesis.RPGEO_TRIANGLE)
+
+    rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, h[4][1], noesis.RPGEO_TRIANGLE)
     
     rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)#delete for Ice Age
     mdl = rapi.rpgConstructModel()  
@@ -103,3 +97,33 @@ def loadTx(tn, tx):
         tx.append(NoeTexture(tn, w, h, data, noesis.NOESISTEX_RGBA32))
     except:
         print('error load tx!')
+    
+def noepyLoadModel2(data, mdlList):
+    bs = NoeBitStream(data)
+    ctx = rapi.rpgCreateContext()
+    bs.seek(80)
+    
+    vinf = [bs.readUInt() for x in range(4)]
+    iinf = [bs.readUInt() for x in range(4)]
+    
+    bs.seek(vinf[1])
+    print('VBUF:',bs.tell())
+    VBUF = bs.readBytes(vinf[3])
+    stride = vinf[3]//vinf[2]
+    print('stride:',stride)
+    rapi.rpgBindPositionBuffer(VBUF, noesis.RPGEODATA_FLOAT, stride)
+    rapi.rpgBindUV1BufferOfs(VBUF, noesis.RPGEODATA_SHORT, stride, 12)
+    
+    bs.seek(iinf[1])
+    IBUF = bs.readBytes(iinf[3])
+    rapi.rpgCommitTriangles(IBUF, noesis.RPGEODATA_USHORT, iinf[2], noesis.RPGEO_TRIANGLE)
+    
+
+    #uv.append(NoeVec3([bs.readShort()/32768, bs.readShort()/32768]+[0]))
+  
+
+    mdl = rapi.rpgConstructModel()
+    mdl.setModelMaterials(NoeModelMaterials([], [NoeMaterial("default","")]))
+    mdlList.append(mdl)
+    rapi.setPreviewOption("setAngOfs", "0 -90 -90")
+    return 1
