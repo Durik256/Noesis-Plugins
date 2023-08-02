@@ -1,10 +1,10 @@
+#by Durik256
 from inc_noesis import *
 
 def registerNoesisTypes():
     handle = noesis.register("My Little Pony Gameloft", ".rk")#and Ice Age Adventures  
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    #noesis.logPopup()#debug
     return 1
     
 def noepyCheckType(data):
@@ -31,21 +31,25 @@ def noepyLoadModel(data, mdlList):
     
     #attr - (type,ofs,size)
     bs.seek(h[13][0])
-    uo = -1
+    uo, ufmt = -1, -1
     for x in range(h[13][1]):
         i = bs.read('H2B')
         if i[0] == 1030:
-            uo = i[1]
+            uo, ufmt = i[1], noesis.RPGEODATA_USHORT
+            rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
+        elif i[0] == 1026:
+            uo, ufmt = i[1], noesis.RPGEODATA_FLOAT
+            rapi.rpgSetUVScaleBias(None, None)
     
     bs.seek(h[3][0])
     strd = h[3][2]//h[3][1]
     vbuf = bs.read(h[3][2])
     rapi.rpgSetMaterial(m[0].name)
     rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, strd)
+    print('uo:',uo)
     if uo != -1:
-        rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, strd, uo)
-    rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
-    
+        rapi.rpgBindUV1BufferOfs(vbuf, ufmt, strd, uo)
+
     bones = []
     if h[7][1]:
         bs.seek(h[7][0])
@@ -65,7 +69,11 @@ def noepyLoadModel(data, mdlList):
         
     bs.seek(h[4][0])
     ibuf = bs.read(h[4][2])
-    rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, h[4][1], noesis.RPGEO_TRIANGLE)
+    ifmt = noesis.RPGEODATA_USHORT
+    if h[3][2] > 65535:
+        ifmt = noesis.RPGEODATA_UINT
+    
+    rapi.rpgCommitTriangles(ibuf, ifmt, h[4][1], noesis.RPGEO_TRIANGLE)
     
     rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)#delete for Ice Age
     mdl = rapi.rpgConstructModel()  
