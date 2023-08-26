@@ -17,7 +17,7 @@ def noepyLoadModel(data, mdlList):
     ctx = rapi.rpgCreateContext()
     bs.seek(80)
     
-    h = {}
+    h = {}#16-submesh_inf;2-texture;3-vert;4-face;6-transform?;7-bones;13-attrb;16-submesh_name;17-weight
     #h = bs.read('68I')
 
     for x in range(17):
@@ -25,9 +25,13 @@ def noepyLoadModel(data, mdlList):
         h[i[0]] = i[1:]
             
     bs.seek(h[2][0])
-    tn = string(bs)
-    m, tx = [NoeMaterial(tn, tn)], []
-    loadTx(tn, tx)
+    mList, txList = [], []
+    for x in range(h[2][1]):
+        tn = string(bs)
+        bs.seek(320,1)
+        unk = bs.read('4I')
+        mList.append(NoeMaterial(tn, tn))
+        loadTx(tn, txList)
     
     #attr - (type,ofs,size)
     bs.seek(h[13][0])
@@ -35,18 +39,37 @@ def noepyLoadModel(data, mdlList):
     for x in range(h[13][1]):
         i = bs.read('H2B')
         if i[0] == 1030:
-            uo = i[1]
-
+            uo, ufmt = i[1], noesis.RPGEODATA_USHORT
+            rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
+        elif i[0] == 1026:
+            uo, ufmt = i[1], noesis.RPGEODATA_FLOAT
+            rapi.rpgSetUVScaleBias(None, None)
+    
+    sm = []
+    
+    bs.seek(h[16][0])
+    for x in range(h[16][1]):
+        name = string(bs)
+        sm.append([name])
+        print(name)
+    
+    bs.seek(h[1][0])
+    for x in range(h[1][1]):
+        #0-numTri,1-ofsIndcs;2-matID;3-unk
+        inf = bs.read('4I')
+        sm[x].append(inf)
+        print('inf:',inf)
+        
+    
     bs.seek(h[3][0])
     strd = h[3][2]//h[3][1]
     vbuf = bs.read(h[3][2])
-    rapi.rpgSetMaterial(m[0].name)
+    #rapi.rpgSetMaterial(mList[0].name)
     rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, strd)
-    print('uo:',uo)
+    #print('uo:',uo)
     if uo != -1:
-        rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, strd, uo)
-    rapi.rpgSetUVScaleBias(NoeVec3([2]*3), None)
-    
+        rapi.rpgBindUV1BufferOfs(vbuf, ufmt, strd, uo)
+
     bones = []
     if h[7][1]:
         bs.seek(h[7][0])
@@ -65,13 +88,24 @@ def noepyLoadModel(data, mdlList):
         rapi.rpgBindBoneWeightBufferOfs(wbuf, noesis.RPGEODATA_USHORT, strd, 4, 2)
         
     bs.seek(h[4][0])
-    ibuf = bs.read(h[4][2])
-
-    rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, h[4][1], noesis.RPGEO_TRIANGLE)
+    #ibuf = bs.read(h[4][2])
+    #print('h:', h)
+    #print('vnum:', h[3][2], 'inum:', h[4][1], 'isize:', h[4][2])
+    ifmt, istride = noesis.RPGEODATA_USHORT, 2
+    if h[3][1] > 65535:
+        ifmt, istride = noesis.RPGEODATA_UINT, 4
+    
+    #rapi.rpgCommitTriangles(ibuf, ifmt, h[4][1], noesis.RPGEO_TRIANGLE)
+    for x in sm:
+        print(x)
+        rapi.rpgSetName(x[0])
+        rapi.rpgSetMaterial(mList[x[1][2]].name)
+        ibuf = bs.read(x[1][0]*3*istride)
+        rapi.rpgCommitTriangles(ibuf, ifmt, x[1][0]*3, noesis.RPGEO_TRIANGLE)
     
     rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)#delete for Ice Age
     mdl = rapi.rpgConstructModel()  
-    mdl.setModelMaterials(NoeModelMaterials(tx, m))
+    mdl.setModelMaterials(NoeModelMaterials(txList, mList))
     mdl.setBones(bones)
     mdlList.append(mdl)
     rapi.setPreviewOption("setAngOfs", "0 -90 -90")#delete for Ice Age
@@ -81,7 +115,7 @@ def string(bs):
     return bs.read(64).split(b'\x00')[0].decode()
     
 def loadTx(tn, tx):
-    print(tn, tx)
+    #print(tn, tx)
     try:
         data = rapi.loadIntoByteArray(rapi.getDirForFilePath(rapi.getInputName())+tn+'.pvr')
         hd = struct.unpack('8I', data[:32])
@@ -97,33 +131,3 @@ def loadTx(tn, tx):
         tx.append(NoeTexture(tn, w, h, data, noesis.NOESISTEX_RGBA32))
     except:
         print('error load tx!')
-    
-def noepyLoadModel2(data, mdlList):
-    bs = NoeBitStream(data)
-    ctx = rapi.rpgCreateContext()
-    bs.seek(80)
-    
-    vinf = [bs.readUInt() for x in range(4)]
-    iinf = [bs.readUInt() for x in range(4)]
-    
-    bs.seek(vinf[1])
-    print('VBUF:',bs.tell())
-    VBUF = bs.readBytes(vinf[3])
-    stride = vinf[3]//vinf[2]
-    print('stride:',stride)
-    rapi.rpgBindPositionBuffer(VBUF, noesis.RPGEODATA_FLOAT, stride)
-    rapi.rpgBindUV1BufferOfs(VBUF, noesis.RPGEODATA_SHORT, stride, 12)
-    
-    bs.seek(iinf[1])
-    IBUF = bs.readBytes(iinf[3])
-    rapi.rpgCommitTriangles(IBUF, noesis.RPGEODATA_USHORT, iinf[2], noesis.RPGEO_TRIANGLE)
-    
-
-    #uv.append(NoeVec3([bs.readShort()/32768, bs.readShort()/32768]+[0]))
-  
-
-    mdl = rapi.rpgConstructModel()
-    mdl.setModelMaterials(NoeModelMaterials([], [NoeMaterial("default","")]))
-    mdlList.append(mdl)
-    rapi.setPreviewOption("setAngOfs", "0 -90 -90")
-    return 1
