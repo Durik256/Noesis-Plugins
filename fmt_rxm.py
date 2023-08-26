@@ -1,6 +1,6 @@
 #by Durik256
-#link on boosty for other format: *.vpp (game archive), *.rxm (static model), *.rxc (character model), *.ceg (texture container)
-#https://boosty.to/durik256/posts/a29c9a1a-5f17-41b4-b6af-107786a34360?share=post_link
+#link for other format: *.vpp (game archive), *.rxm (static model), *.rxc (character model), *.ceg (texture container)
+#https://vladikdurik256.wixsite.com/plugins/product-page/the-punisher-pc
 from inc_noesis import *
 
 def registerNoesisTypes():
