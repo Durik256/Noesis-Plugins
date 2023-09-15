@@ -139,12 +139,12 @@ def parseVif(buf, offs):
                         val = getfloat32(buf, width * j + offs)
                         j += 1
                     addroffs = cl * (i // wl) + (i % wl) if cl >= wl else 0
-                    vumem[addr + addroffs] = NoeVec4([
+                    vumem[addr + addroffs] = [
                         maybe_mask_value(val, 0, i, m),
                         maybe_mask_value(val, 1, i, m),
                         maybe_mask_value(val, 2, i, m),
                         maybe_mask_value(val, 3, i, m),
-                    ])
+                    ]
             elif vnvl == 0b0100:  # V2-32
                 width = 8
                 for i in range(qwd):
@@ -153,12 +153,12 @@ def parseVif(buf, offs):
                         val = getnfloat32(buf, width * j + offs, 2)
                         j += 1
                     addroffs = cl * (i // wl) + (i % wl) if cl >= wl else 0
-                    vumem[addr + addroffs] = NoeVec4([
+                    vumem[addr + addroffs] = [
                         maybe_mask_value(val[0], 0, i, m),
                         maybe_mask_value(val[1], 1, i, m),
                         maybe_mask_value(0, 2, i, m),
                         maybe_mask_value(0, 3, i, m),
-                    ])
+                    ]
             elif vnvl == 0b1000:  # V3-32
                 width = 12
                 for i in range(qwd):
@@ -167,12 +167,12 @@ def parseVif(buf, offs):
                         val = getnfloat32(buf, width * j + offs, 3)
                         j += 1
                     addroffs = cl * (i // wl) + (i % wl) if cl >= wl else 0
-                    vumem[addr + addroffs] = NoeVec4([
+                    vumem[addr + addroffs] = [
                         maybe_mask_value(val[0], 0, i, m),
                         maybe_mask_value(val[1], 1, i, m),
                         maybe_mask_value(val[2], 2, i, m),
                         maybe_mask_value(0, 3, i, m),
-                    ])
+                    ]
             elif vnvl == 0b1100:  # V4-32
                 width = 16
                 for i in range(qwd):
@@ -181,12 +181,12 @@ def parseVif(buf, offs):
                         val = getnfloat32(buf, width * j + offs, 4)
                         j += 1
                     addroffs = cl * (i // wl) + (i % wl) if cl >= wl else 0
-                    vumem[addr + addroffs] = NoeVec4([
+                    vumem[addr + addroffs] = [
                         maybe_mask_value(val[0], 0, i, m),
                         maybe_mask_value(val[1], 1, i, m),
                         maybe_mask_value(val[2], 2, i, m),
                         maybe_mask_value(val[3], 3, i, m),
-                    ])
+                    ]
             else:
                 err('Unsupported unpack vnvl {} at offset {}'.format(hex(vnvl), hex(offs)))
             offs += j * width
@@ -228,11 +228,10 @@ def LoadModel(data, mdlList):
 
         def getTransform(buf, offs, ind):
             transformOffs = offs + ind * 0x40
-            matrix = NoeMat44()
+            matrix = []
             for i in range(4):
-                matrix[i] = NoeVec4([getfloat32(buf, transformOffs + i * 0x10 + j * 0x4) for j in range(4)])
-            #print(matrix)
-            return matrix.transpose()#np.matrix(matrix).transpose()
+                matrix += [[getfloat32(buf, transformOffs + i * 0x10 + j * 0x4) for j in range(4)]]
+            return MyMatrix(matrix).transpose()
 
         # Get global transform of current bone.
         transformTableOffs = getuint32(buf, rootNode.dataOffs + 0x14) + rootNode.dataOffs
@@ -291,12 +290,12 @@ def LoadModel(data, mdlList):
                         if buf[vertexNode.dataOffs + 0x8] == 1:
                             parseVif(buf, vertexNode.dataOffs)
                             for i in range(vertexCount):
-                                v = transform * vumem[i]
-                                submeshPiece.vtx.append(v)
+                                v = transform * MyMatrix(vumem[i]).reshape()
+                                submeshPiece.vtx.append(v.flatten())
                         else:
                             for i in range(vertexCount):
-                                v = transform * NoeVec4((getnfloat32(buf, vertexNode.dataOffs + i * 0x10 + 0x10, 4)))
-                                submeshPiece.vtx.append(v)
+                                v = transform * MyMatrix(getnfloat32(buf, vertexNode.dataOffs + i * 0x10 + 0x10, 4)).reshape()
+                                submeshPiece.vtx.append(v.flatten())
 
                         ind = []
                         # Join indices and texture coordinates across all sub-pieces. There is far too much indentation here.
@@ -339,14 +338,51 @@ def LoadModel(data, mdlList):
                     
                     for ind in submeshPiece.ind:
                         for i in range(3):
-                            vbuf += submeshPiece.vtx[ind[i][0]].toBytes()
-                            uvbuf += submeshPiece.vt[ind[i][1]].toBytes()
+                            v = submeshPiece.vtx[ind[i][0]]
+                            vbuf += noePack('3f', v[0], v[1], v[2])
+                            
+                            vt = submeshPiece.vt[ind[i][1]]
+                            uvbuf += noePack('2f', v[0], v[1])
                     
-                    rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 16)
-                    rapi.rpgBindUV1Buffer(uvbuf, noesis.RPGEODATA_FLOAT, 16)
-                    rapi.rpgCommitTriangles(None, noesis.RPGEODATA_USHORT, len(vbuf)//16, noesis.RPGEO_TRIANGLE)
+                    rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 12)
+                    rapi.rpgBindUV1Buffer(uvbuf, noesis.RPGEODATA_FLOAT, 8)
+                    rapi.rpgCommitTriangles(None, noesis.RPGEODATA_USHORT, len(vbuf)//12, noesis.RPGEO_TRIANGLE)
             
     mdl = rapi.rpgConstructModel()#NoeModel()#
     mdlList.append(mdl)
     #rapi.setPreviewOption("setAngOfs", "0 -90 0")
     return 1
+    
+class MyMatrix:
+    def __init__(self, data):
+        self.data = data
+        
+    def __repr__(self):
+        return repr(self.data)
+
+    def transpose(self):
+        transposed_data = [[self.data[j][i] for j in range(len(self.data))] for i in range(len(self.data[0]))]
+        return MyMatrix(transposed_data)
+        
+    def reshape(self):
+        return MyMatrix([[self.data[0]], [self.data[1]], [self.data[2]], [self.data[3]]])
+        
+    def __mul__(self, other):
+        if len(self.data[0]) != len(other.data):
+            raise ValueError("Number of columns in the first matrix must be equal to the number of rows in the second matrix")
+        
+        result_data = []
+        for i in range(len(self.data)):
+            row = []
+            for j in range(len(other.data[0])):
+                sum = 0
+                for k in range(len(other.data)):
+                    sum += self.data[i][k] * other.data[k][j]
+                row.append(sum)
+            result_data.append(row)
+
+        return MyMatrix(result_data)
+        
+    def flatten(self):
+        return [self.data[0][0], self.data[1][0], self.data[2][0], self.data[3][0]]
+        
