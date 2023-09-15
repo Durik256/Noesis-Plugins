@@ -342,7 +342,7 @@ def LoadModel(data, mdlList):
                             vbuf += noePack('3f', v[0], v[1], v[2])
                             
                             vt = submeshPiece.vt[ind[i][1]]
-                            uvbuf += noePack('2f', v[0], v[1])
+                            uvbuf += noePack('2f', vt[0], vt[1])
                     
                     rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 12)
                     rapi.rpgBindUV1Buffer(uvbuf, noesis.RPGEODATA_FLOAT, 8)
