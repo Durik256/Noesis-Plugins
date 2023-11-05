@@ -9,8 +9,8 @@ def registerNoesisTypes():
     return 1
 
 def noepyCheckType(data):
-    if data[:3] != b'R7C':
-        return 0
+    #if data[:3] != b'R7C':
+    #    return 0
     return 1
 
 def LoadModel (data, mdlList):
