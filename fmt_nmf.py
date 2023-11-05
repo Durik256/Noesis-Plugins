@@ -15,6 +15,8 @@ def noepyCheckType(data):
 def LoadModel (data, mdlList):
     bs = NoeBitStream(data)
     ctx = rapi.rpgCreateContext()
+    global mtrx
+    mtrx = NoeMat43()
 
     while bs.tell() < bs.getSize():
         readChunk(bs)
@@ -28,6 +30,11 @@ def readChunk(bs):
     size = bs.read('>I')[0]
     cpos = bs.tell()
     print(label,size)
+    if label == b'FRAM':
+        uo, u1 = bs.read('2I')
+        name = readString(bs)
+        print('    ',name)
+        mtrx = NoeMat44.fromBytes(bs.read(64)).toMat43()
     if label == b'MESH':
         uo, u1 = bs.read('2I')
         name = readString(bs)
@@ -36,6 +43,8 @@ def readChunk(bs):
         uvbuf = bs.read(vnum*8)
         inum = bs.readUInt()
         ibuf = bs.read(inum*2)
+        global mtrx
+        rapi.rpgSetTransform(mtrx)
         rapi.rpgSetName(name)
         rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 40)
         rapi.rpgBindUV1Buffer(uvbuf, noesis.RPGEODATA_FLOAT, 8)
