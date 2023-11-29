@@ -19,7 +19,7 @@ def LoadModel(data, mdlList):
     
     bones = []
     bs.seek(inf[21])
-    for x in range(inf[9]):
+    for x in range(inf[11]):
         cpos = bs.tell()
         unk = bs.read('>2h2If')
         name = bs.read(256).replace(b'\x00', b'').decode('ascii', errors='ignore')
@@ -30,7 +30,7 @@ def LoadModel(data, mdlList):
         bs.seek(cpos+unk[2])
 
     bs.seek(inf[19])
-    for x in range(inf[11]):
+    for x in range(inf[9]):
         cpos = bs.tell()
         unk = bs.read('>2h2If')
         name = bs.read(256).replace(b'\x00', b'').decode('ascii', errors='ignore')
