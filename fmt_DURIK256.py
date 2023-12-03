@@ -7,7 +7,6 @@ def registerNoesisTypes():
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
     return 1
 
-
 def noepyCheckType(data):
     if data[:8] != b'DURIK256':
         return 0
@@ -23,13 +22,11 @@ def noepyLoadModel(data, mdlList):
 
     num_bones = bs.readUInt()
     num_meshes = bs.readUInt()
-    print('num_bones:', num_bones, 'num_meshes:', num_meshes)
     
     #read bones
     bones = []
     for x in range(num_bones):
-        len_name = bs.readUInt()
-        name = noeStrFromBytes(bs.read(len_name))
+        name = readString(bs)
         matrix = NoeMat44.fromBytes(bs.read(64)).toMat43()
         parent = bs.readInt()
         bones.append(NoeBone(x,name,matrix,None,parent))
@@ -40,16 +37,14 @@ def noepyLoadModel(data, mdlList):
     if bs.readUInt():
         num_mats = bs.readUInt()
         for x in range(num_mats):
-            len_name = bs.readUInt()
-            name = noeStrFromBytes(bs.read(len_name))
+            name = readString(bs)
             mat = NoeMaterial(name,'')
                 
             diff = NoeVec4.fromBytes(bs.read(16))
             mat.setDiffuseColor(diff)
 
             if bs.readUInt():
-                len_name = bs.readUInt()
-                name = noeStrFromBytes(bs.read(len_name))
+                name = readString(bs)
                 mat.setTexture(name)
         materials.append(mat)
     
@@ -57,22 +52,18 @@ def noepyLoadModel(data, mdlList):
         materials.append(NoeMaterial('default',''))
     
     for x in range(num_meshes):
-        len_name = bs.readUInt()
-        name = noeStrFromBytes(bs.read(len_name))
+        name = readString(bs)
         rapi.rpgSetName(name)
         
         #read materials
         if bs.readUInt():
-            len_name = bs.readUInt()
-            mat_name = noeStrFromBytes(bs.read(len_name))
+            mat_name = readString(bs)
             rapi.rpgSetMaterial(mat_name)
         
         vnum = bs.readUInt()
         inum = bs.readUInt()
-        print('vnum:', vnum, 'inum:', inum)
         
         #read pos vertex
-        print('vbuf_ofs:', bs.tell())
         vbuf = bs.read(vnum*12)
         rapi.rpgBindPositionBuffer(vbuf,noesis.RPGEODATA_FLOAT,12)
         
@@ -93,7 +84,6 @@ def noepyLoadModel(data, mdlList):
             rapi.rpgBindBoneWeightBufferOfs(wbuf,noesis.RPGEODATA_FLOAT,24,8,4)
 
         #read traingles
-        print('ibuf_ofs:', bs.tell())
         ibuf = bs.read(inum*2)
         rapi.rpgCommitTriangles(ibuf,noesis.RPGEODATA_USHORT,inum,noesis.RPGEO_TRIANGLE)
         rapi.rpgClearBufferBinds()
@@ -102,13 +92,7 @@ def noepyLoadModel(data, mdlList):
     anims = []
     numAnims = bs.readInt()
     for i in range(0, numAnims):
-        len_name = bs.readUInt()
-        name = noeStrFromBytes(bs.read(len_name))
-        #numAnimBones = bs.readInt()
-        #animBones = []
-        #for j in range(0, numAnimBones):
-        #    animBone = noepyReadBone(bs)
-        #    animBones.append(animBone)
+        name = readString(bs)
         animNumFrames = bs.readInt()
         animFrameRate = bs.readFloat()
         numFrameMats = bs.readInt()
@@ -124,5 +108,8 @@ def noepyLoadModel(data, mdlList):
     mdl.setAnims(anims)
     mdl.setModelMaterials(NoeModelMaterials([], materials))
     mdlList.append(mdl)
-    
     return 1
+
+def readString(bs):
+    len_name = bs.readUInt()
+    return noeStrFromBytes(bs.read(len_name))
