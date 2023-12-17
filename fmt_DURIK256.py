@@ -46,7 +46,7 @@ def noepyLoadModel(data, mdlList):
             if bs.readUInt():
                 name = readString(bs)
                 mat.setTexture(name)
-        materials.append(mat)
+            materials.append(mat)
     
     if not materials:
         materials.append(NoeMaterial('default',''))
