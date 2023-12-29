@@ -1,38 +1,41 @@
+#by Durik256
 from inc_noesis import *
 
 def registerNoesisTypes():
-    handle = noesis.register("yingxiong skeleton",".skel")
-    noesis.setHandlerTypeCheck(handle, CheckType)
-    noesis.setHandlerLoadModel(handle, LoadSkeleton)	
-    return 1
-    
-def CheckType(data):
-    bs = NoeBitStream(data)
-    magic = bs.readInt()
-    if magic != 100 and magic != 1:
-        return 0
+    handle = noesis.register("Lost Saga", ".skl")
+    noesis.setHandlerTypeCheck(handle, noepyCheckType)
+    noesis.setHandlerLoadModel(handle, noepyLoadModel)
+    noesis.logPopup()
     return 1
 
-def LoadSkeleton(data, mdlList):
+def noepyCheckType(data):
+    if data[:3] != b'SKL':
+        return 0
+    return 1   
+	
+def noepyLoadModel(data, mdlList):
     bs = NoeBitStream(data)
-    type = bs.readInt()
-    #bs.seek(4)
-    cBones = bs.readUInt()
-    
+    bs.seek(8)#SKL, unk
+
     bones = []
-    for i in range(cBones):
-        boneName = noeAsciiFromBytes(bs.readBytes(bs.readUInt()))
-        parent = bs.readInt()
-        if type == 100:
-            position = NoeVec3([bs.readHalfFloat() for x in range(3)])
-            mat = NoeQuat([bs.readHalfFloat() for x in range(4)]).toMat43()
-        else:
-            position = NoeVec3.fromBytes(bs.readBytes(12))
-            mat = NoeQuat.fromBytes(bs.readBytes(16)).toMat43()
-        mat[3] = position
-        bones.append(NoeBone(i, boneName, mat, None, parent))
-    
-    mdlList.append(NoeModel([],bones))
+    for x in range(bs.readUInt()):
+        name = readFixedString(bs)
+        print(x,name)
+        bs.seek(56,1)
+        #m_vLocal = NoeVec3.fromBytes(bs.read(12))
+        #m_qtLocal = NoeQuat.fromBytes(bs.read(16))
+        #m_vBipedSpace = NoeVec3.fromBytes(bs.read(12))
+        #m_qtBipedSpace = NoeQuat.fromBytes(bs.read(16))
+        m_matObjectTM = NoeMat44.fromBytes(bs.read(64)).toMat43()
+        parent = readFixedString(bs)
+        for y in range(bs.readUInt()):
+            child = readFixedString(bs)
+        bones.append(NoeBone(x,name,m_matObjectTM,parent))
+
+    mdl = NoeModel()
+    mdl.setBones(bones)
+    mdlList.append(mdl)
     return 1
     
-    
+def readFixedString(bs):
+    return bs.readBytes(bs.readUInt()).decode()
