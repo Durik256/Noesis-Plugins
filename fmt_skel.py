@@ -5,7 +5,6 @@ def registerNoesisTypes():
     handle = noesis.register("Lost Saga", ".skl")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
@@ -20,7 +19,6 @@ def noepyLoadModel(data, mdlList):
     bones = []
     for x in range(bs.readUInt()):
         name = readFixedString(bs)
-        print(x,name)
         bs.seek(56,1)
         #m_vLocal = NoeVec3.fromBytes(bs.read(12))
         #m_qtLocal = NoeQuat.fromBytes(bs.read(16))
