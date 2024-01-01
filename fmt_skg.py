@@ -17,7 +17,7 @@ def noepyLoadModel(data, mdlList):
     bs.seek(8)#SKG
     fsize = bs.readUInt()
     fname = bs.read(32)
-    #0-animNum?; 1-animOfs; 2-unkOfs; 3-unkNum(64bytes); 4-anim2Ofs?; 5-meshNum; 6-meshOfs; 7-numTx; 8-ofsTx; 9-unkNum; 10-unkOfs; 11...unk_float
+    #0-animNum?; 1-animOfs?; 2-boneOfs; 3-animNum; 4-anim2Ofs?; 5-meshNum; 6-meshOfs; 7-numTx; 8-ofsTx; 9-unkNum; 10-unkOfs; 11...unk_float
     inf = bs.read('11I6f')
     print(inf)
     
