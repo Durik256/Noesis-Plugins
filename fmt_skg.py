@@ -64,14 +64,10 @@ def noepyLoadModel(data, mdlList):
         bs.seek(msh_inf[4])
         vbuf = b''
         for i in range(msh_inf[0]):
-            num = bs.readUInt()
-            newV = NoeVec3()
-            for j in range(num):
-                v = NoeVec3.fromBytes(bs.read(12))
-                boneId = bs.readInt()
-                weight = bs.readFloat()
-                newV += bones[boneId].getMatrix()*v*weight
-            vbuf += newV.toBytes()
+            v = NoeVec3()
+            for j in range(bs.readUInt()):
+                v += NoeVec3.fromBytes(bs.read(12))*bones[bs.readInt()].getMatrix()*bs.readFloat()
+            vbuf += v.toBytes()
             
         bs.seek(msh_inf[-1])
         for i in range(msh_inf[-2]):
