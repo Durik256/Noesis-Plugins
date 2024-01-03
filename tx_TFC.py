@@ -52,20 +52,6 @@ def getRes2(fsize):
     for x in range(len(res)):
         if fsize == (res[x]*res[x]):
             return [noesis.NOESISTEX_DXT5, res[x], res[x]]
-    return getRes3(fsize)
-    
-def getRes3(fsize):
-    for x in range(1, len(res)):
-        w, h = res[x], res[x]//2
-        if fsize == (w*h//2):
-            return [noesis.NOESISTEX_DXT1, w, h]
-    return getRes4(fsize)
-    
-def getRes4(fsize):
-    for x in range(1, len(res)):
-        w, h = res[x], res[x]//2
-        if fsize == (w*h):
-            return [noesis.NOESISTEX_DXT5, w, h]
     return [0, 4, 4]
 
 def findall(p, s):
