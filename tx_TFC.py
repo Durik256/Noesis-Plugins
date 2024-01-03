@@ -67,13 +67,6 @@ def getRes4(fsize):
         if fsize == (w*h):
             return [noesis.NOESISTEX_DXT5, w, h]
     return [0, 4, 4]
-    
-def getRes_Old(fsize):
-    for x in res[::-1]:
-        for y in res[::-1]:
-            if fsize == (x*y//2):
-                return [x, y]
-    return [4, 4]
 
 def findall(p, s):
     i = s.find(p)
