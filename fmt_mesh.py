@@ -16,6 +16,9 @@ def noepyLoadModel(data, mdlList):
     ctx = rapi.rpgCreateContext()
 
     while bs.tell() < bs.getSize():
+        if bs.tell() + 12 >= bs.getSize():
+            break
+        
         unks = bs.read('3I')
         print('unks:', unks)
         if not unks[0] and not unks[1] and not unks[2]:
@@ -41,9 +44,8 @@ def noepyLoadModel(data, mdlList):
                     name = 'mesh_%i'%bs.tell()
                     rapi.rpgSetName(name)
                     rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 76)
-                    #rapi.rpgBindUV1Buffer(uvbuf, noesis.RPGEODATA_HALFFLOAT, 16)
+                    rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_FLOAT, 76, 68)
                     rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, inum*3, noesis.RPGEO_TRIANGLE)
-                
         else:
             bs.seek(unks[2],1)
 
