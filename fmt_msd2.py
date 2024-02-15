@@ -46,6 +46,21 @@ def noepyLoadModel(data, mdlList):
         ibuf = bs.read(inum*2)
         iofs = bs.tell()
         bs.seek(cpos)
+        
+        nnum  = bs.readUInt()
+        bs.seek(nnum*12,1)
+        
+        num  = bs.readUInt()
+        bs.seek(num*16,1)
+        bs.seek(8,1)
+        bnum = bs.readUInt()
+        names = []
+        for x in range(bnum):
+            names.append(readString(bs))
+            
+        wnum  = bs.readUInt()
+        bs.seek(wnum*20,1)
+        print(bs.tell())
 
         rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 12)
         rapi.rpgBindUV1Buffer(uvbuf, noesis.RPGEODATA_FLOAT, 8)
