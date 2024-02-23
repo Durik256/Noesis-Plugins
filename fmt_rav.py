@@ -65,7 +65,7 @@ def LoadModel(data, mdlList):
             bs.seek(m_inf[1])
             print('        vnum:', m_inf[0],'vOfs:',m_inf[1])
             vbuf = bs.read(m_inf[0]*12)
-            vbuf += b'\x00'*(m_inf[4]-m_inf[0])*12
+            #vbuf += b'\x00'*(m_inf[4]-m_inf[0])*12
             rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 12)
             rapi.rpgCommitTriangles(None, noesis.RPGEODATA_USHORT, m_inf[0], noesis.RPGEO_POINTS)
             
