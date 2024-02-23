@@ -5,6 +5,7 @@ def registerNoesisTypes():
     handle = noesis.register("FIFA 2001 (PC)", ".rav")
     noesis.setHandlerTypeCheck(handle, CheckType)
     noesis.setHandlerLoadModel(handle, LoadModel)
+    noesis.logPopup()
     return 1
 
 def CheckType(data):
