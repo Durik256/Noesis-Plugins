@@ -47,7 +47,7 @@ def LoadModel(data, mdlList):
         
         if inf[1]:
             bs.seek(inf[2])
-            # 0-numM?;1-mOfs;2-unkOfs3-zero;4-unkOfs;5-numSM;6-ofsSM;7,12-boundBox;13-numUnks1?;14-ofsUnks1;15-zero
+            # 0-numM?;1-mOfs;2-unkOfs3-zero;4-DuplicateOfs?;5-numSM;6-ofsSM;7,12-boundBox;13-numUnks1?;14-ofsUnks1;15-zero
             inf0 = bs.read('7I6f3I')
             print('inf0:',inf0[:7]+inf0[13:])
             
