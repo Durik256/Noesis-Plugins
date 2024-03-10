@@ -112,7 +112,7 @@ def noepyLoadModel(data, mdlList):
     return 1
     
 def string(bs):
-    return bs.read(64).split(b'\x00')[0].decode()
+    return bs.read(64).split(b'\x00')[0].decode('ascii', errors='ignore')
     
 def loadTx(tn, tx):
     #print(tn, tx)
