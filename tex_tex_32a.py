@@ -2,7 +2,7 @@
 from inc_noesis import *
 
 def registerNoesisTypes():
-    handle = noesis.register("Screamer 4x4", ".tex;.32a;.map")
+    handle = noesis.register("Screamer 4x4", ".tex;.32a;.map;.rgb")
     noesis.setHandlerTypeCheck(handle, CheckType)
     noesis.setHandlerLoadRGBA(handle, LoadRGBA)
     #noesis.logPopup()
@@ -34,11 +34,11 @@ def LoadRGBA(data, texList):
         
         data = rapi.imageDecodeRaw(data[20:], wh, wh, fmt)
         
-    elif ext == '.32a':
-        data = rapi.imageDecodeRaw(data[20:], wh, wh, 'r8g8b8a8')
+    elif ext == '.32a' or ext == '.map':
+        data = rapi.imageDecodeRaw(data, wh, wh, 'r8g8b8a8')
     
-    elif ext == '.map':
-        data = rapi.imageDecodeRaw(data[20:], wh, wh, 'r8g8b8a8')
+    elif ext == '.rgb':
+        data = rapi.imageDecodeRaw(data, wh, wh, 'r8g8b8')
 
     texList.append(NoeTexture(rapi.getInputName(), wh, wh, data, noesis.NOESISTEX_RGBA32))
     return 1
