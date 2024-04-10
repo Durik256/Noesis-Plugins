@@ -5,7 +5,7 @@ def registerNoesisTypes():
     handle = noesis.register("Screamer 4x4", ".dat")
     noesis.setHandlerTypeCheck(handle, CheckType)
     noesis.setHandlerLoadModel(handle, LoadModel)
-    noesis.logPopup()
+    #noesis.logPopup()
     return 1
 
 def CheckType(data):
@@ -68,6 +68,7 @@ def LoadModel(data, mdlList):
         print('Error load textures.dat, use 1 material.')
         matsID = [0]*inum
     
+    rapi.rpgSetUVScaleBias(NoeVec3([1,-1,1]), None)
     for x in range(inum):
         vbuf = b''
         for j in faces[x]:
