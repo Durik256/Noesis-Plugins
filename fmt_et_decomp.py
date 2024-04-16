@@ -5,7 +5,7 @@ def registerNoesisTypes():
     handle = noesis.register("ben 10 omniverse", ".et_decomp")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    noesis.logPopup()
+    #noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
