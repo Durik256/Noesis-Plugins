@@ -89,23 +89,31 @@ def LoadTexture(data, bs, texList):
             data = bs.read(size)
             bs.seek(x-72)
             name = bs.read(36).replace(b'\x00',b'').decode('ascii','ignore')
-            if fmt == 11:
-                fmt = noesis.NOESISTEX_DXT1
-                if size >= (width * height):
-                    fmt = noesis.NOESISTEX_DXT5
-            elif fmt == 10:
-                if size >= (width * height):
-                    data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT5)
-                else:
-                    data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT1)
-                fmt = noesis.NOESISTEX_RGBA32
-            elif fmt == 9:
-                #FOURCC_BC5
+            #if fmt == 11:
+            #    fmt = noesis.NOESISTEX_DXT1
+            #    if size >= (width * height):
+            #        fmt = noesis.NOESISTEX_DXT5
+            #elif fmt == 10:
+            #    if size >= (width * height):
+            #        data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT5)
+            #    else:
+            #        data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT1)
+            #    fmt = noesis.NOESISTEX_RGBA32
+            #elif fmt == 9:
+            #    #FOURCC_BC5
+            #    if size >= (width * height):
+            #        data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_BC3)
+            #    else:
+            #        data = rapi.imageDecodeDXT(data, width, height, noesis.NOESISTEX_DXT1)
+            #    fmt = noesis.NOESISTEX_RGBA32
+            #else:
+            #    print('unknow fmt', fmt)
+            #    continue
+            if size >= (width * height):
                 data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_BC3)
-                fmt = noesis.NOESISTEX_RGBA32
             else:
-                print('unknow fmt', fmt)
-                continue
+                data = rapi.imageDecodeDXT(data, width, height, noesis.NOESISTEX_DXT1)
+            fmt = noesis.NOESISTEX_RGBA32
 
             texList.append(NoeTexture(name, width, height, data, fmt))
 
