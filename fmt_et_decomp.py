@@ -39,19 +39,28 @@ def noepyLoadModel(data, mdlList):
         vnum = max(noeUnpack('>%iH'%inum, ibuf))+1
         print('vnum:',[vnum],[bs.tell()])
         bs.seek(cpos)
-        bs.seek(-(vnum*28+4),1)
+        vstride, uvstride = 8, 20
+        bs.seek(-(vnum*(vstride+uvstride)+4),1)
         real_vnum = bs.readUInt()
         print('real_vnum:',[real_vnum],[bs.tell()])
         if vnum != real_vnum:
-            print('bad vnum, skip result::', x)
-            continue
-        vbuf = bs.read(vnum*8)
-        uvbuf = bs.read(vnum*20)
+            print('bad firs vnum::', x)
+            vstride, uvstride = 24, 8
+            bs.seek(cpos)
+            bs.seek(-(vnum*(vstride+uvstride)+4),1)
+            real_vnum = bs.readUInt()
+            if vnum != real_vnum:
+                print('bad vnum, skip result::', x)
+                continue
+        
+        vbuf = bs.read(vnum*vstride)
+        uvbuf = bs.read(vnum*uvstride)
         
         try:
             rapi.rpgSetName('mesh_%i'%x)
-            rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_SHORT, 8)
-            rapi.rpgBindUV1BufferOfs(uvbuf, noesis.RPGEODATA_SHORT, 20, 8)
+            rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_SHORT, vstride)
+            rapi.rpgBindUV1BufferOfs(uvbuf, noesis.RPGEODATA_SHORT, uvstride, 0)
+            rapi.rpgBindUV2BufferOfs(uvbuf, noesis.RPGEODATA_SHORT, uvstride, 4)
             rapi.rpgCommitTriangles(ibuf,noesis.RPGEODATA_USHORT,inum,noesis.RPGEO_TRIANGLE)
         except:
             rapi.rpgClearBufferBinds()
