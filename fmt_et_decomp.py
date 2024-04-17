@@ -94,7 +94,10 @@ def LoadTexture(data, bs, texList):
                 if size >= (width * height):
                     fmt = noesis.NOESISTEX_DXT5
             elif fmt == 10:
-                data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT5)
+                if size >= (width * height):
+                    data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT5)
+                else:
+                    data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT1)
                 fmt = noesis.NOESISTEX_RGBA32
             elif fmt == 9:
                 #FOURCC_BC5
