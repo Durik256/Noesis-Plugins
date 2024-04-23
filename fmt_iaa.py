@@ -66,7 +66,7 @@ def noepyLoadModel(data, mdlList):
                     bs.seek(ibuf_ofs + iofs*2)
                     ibuf = bs.read(inum*2)
                     rapi.rpgCommitTriangles(ibuf,noesis.RPGEODATA_USHORT,inum,noesis.RPGEO_TRIANGLE)
-                elif itype == 3:
+                elif itype == 2:
                     bs.seek(ibuf_ofs + iofs)
                     ibuf = bs.read(inum)
                     rapi.rpgCommitTriangles(ibuf,noesis.RPGEODATA_UBYTE,inum,noesis.RPGEO_TRIANGLE)
