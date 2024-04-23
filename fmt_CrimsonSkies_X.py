@@ -5,7 +5,6 @@ def registerNoesisTypes():
     handle = noesis.register("Crimson Skies (2003)", ".x")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    #noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
@@ -43,7 +42,6 @@ def readNode(bs,parent=None):
     
     rapi.rpgSetName(name)
     rapi.rpgSetTransform(trfm) 
-    print(name, [bs.tell()])
     for x in range(bs.readUInt()):
         readMesh(bs)
     
@@ -58,7 +56,6 @@ def readMesh(bs):
     u1 = bs.readUInt()
     u2 = bs.read('>i')[0]
 
-    print('unk:',u0,clr,u1,u2)
     mat_name = 'mat_%i'%len(materials)
     mat = NoeMaterial(mat_name, '')
     mat.setDiffuseColor(NoeVec4([clr[0]/255,clr[1]/255,clr[2]/255,clr[3]/255]))
@@ -68,22 +65,18 @@ def readMesh(bs):
     
     for x in range(numTx):
         tx_name = readString(bs)
-        print('    ',tx_name)
-        
         if not x: mat.setTexture(tx_name)
     
     materials.append(mat)
     
     vnum = bs.readShort()
-    print('vnum:',vnum,'vstart:',bs.tell())
     vbuf = bs.read(vnum*32)
     
-    print(bs.read('16B'))
+    bs.read('16B')
     if bs.readUByte():
         bs.seek(bs.readShort() * 12 * 4, 1)
        
     inum = bs.readShort()
-    print('inum:',inum,'istart:',bs.tell())
     ibuf = bs.read(inum*2)
     
     rapi.rpgSetMaterial(mat_name)
@@ -102,9 +95,7 @@ def readMesh(bs):
     else:
         size=28
         numUnk= bs.readShort()
-    bs.seek(numUnk*size, 1) 
-    
-    print('end_mesh:', bs.tell())
+    bs.seek(numUnk*size, 1)
    
 def readString(bs):
     return bs.read(bs.readUInt()).split(b'\x00')[0].decode('ascii', 'ignore')
