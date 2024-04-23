@@ -2,7 +2,7 @@
 from inc_noesis import *
 
 def registerNoesisTypes():
-    handle = noesis.register("Crimson Skies (Xbox)", ".x")
+    handle = noesis.register("Crimson Skies (2003)", ".x")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
     #noesis.logPopup()
