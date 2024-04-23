@@ -26,17 +26,19 @@ def noepyLoadModel(data, mdlList):
     except:
         mdl = NoeModel()
     
-    if nodes:
-        nodes = rapi.multiplyBones(nodes)
+    #if nodes:
+    #    nodes = rapi.multiplyBones(nodes)
     
     mdl.setBones(nodes)
     mdl.setModelMaterials(NoeModelMaterials([], materials))
     mdlList.append(mdl)
     return 1
     
-def readNode(bs,parent=None):
+def readNode(bs,parent=None,ptrfm=None):
     name = readString(bs)
     trfm = NoeMat43.fromBytes(bs.read(48)).transpose()
+    if ptrfm:
+        trfm *= ptrfm
     bbox = bs.read('6f')
     bs.read(4)# 3
     
@@ -48,7 +50,7 @@ def readNode(bs,parent=None):
     nodes.append(NoeBone(len(nodes),name,trfm,parent))
     
     for x in range(bs.readUInt()):
-        readNode(bs,name)
+        readNode(bs,name,trfm)
     
 def readMesh(bs):
     u0 = bs.readUInt()
