@@ -79,43 +79,26 @@ def noepyLoadModel(data, mdlList):
     return 1
     
 def LoadTexture(data, bs, texList):
-    result = [i for i in findall(b'\x00\x01\x00\x00\x00\x00\x00\x00\xBB\xBB\xBB\xBB', data)]
+    result = [i for i in findall(b'\x01\x00\x00\x00\x00\x00\x00\xBB\xBB\xBB\xBB', data)] 
     print('tx_result:', result)
     for x in result:
-        bs.seek(x+16)
-        if not bs.readUByte() and 257 == bs.readUInt():
-            width, height, fmt, size = bs.read('>4I')
-            print('tx::', width, height, fmt, size)
-            data = bs.read(size)
-            bs.seek(x-72)
-            name = bs.read(36).replace(b'\x00',b'').decode('ascii','ignore')
-            #if fmt == 11:
-            #    fmt = noesis.NOESISTEX_DXT1
-            #    if size >= (width * height):
-            #        fmt = noesis.NOESISTEX_DXT5
-            #elif fmt == 10:
-            #    if size >= (width * height):
-            #        data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT5)
-            #    else:
-            #        data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_DXT1)
-            #    fmt = noesis.NOESISTEX_RGBA32
-            #elif fmt == 9:
-            #    #FOURCC_BC5
-            #    if size >= (width * height):
-            #        data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_BC3)
-            #    else:
-            #        data = rapi.imageDecodeDXT(data, width, height, noesis.NOESISTEX_DXT1)
-            #    fmt = noesis.NOESISTEX_RGBA32
-            #else:
-            #    print('unknow fmt', fmt)
-            #    continue
-            if size >= (width * height):
-                data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_BC3)
-            else:
-                data = rapi.imageDecodeDXT(data, width, height, noesis.NOESISTEX_DXT1)
-            fmt = noesis.NOESISTEX_RGBA32
+        try:
+            bs.seek(x+15)
+            if not bs.readUByte() and 257 == bs.readUInt():
+                width, height, fmt, size = bs.read('>4I')
+                print('tx::', width, height, fmt, size)
+                data = bs.read(size)
+                bs.seek(x-72)
+                name = bs.read(36).replace(b'\x00',b'').decode('ascii','ignore')
+                if size >= (width * height):
+                    data = rapi.imageDecodeDXT(data, width, height, noesis.FOURCC_BC3)
+                else:
+                    data = rapi.imageDecodeDXT(data, width, height, noesis.NOESISTEX_DXT1)
+                fmt = noesis.NOESISTEX_RGBA32
 
-            texList.append(NoeTexture(name, width, height, data, fmt))
+                texList.append(NoeTexture(name, width, height, data, fmt))
+        except:
+            print('error load texture:', x+15)
 
 def findall(p, s):
     i = s.find(p)
