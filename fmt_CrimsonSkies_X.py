@@ -53,7 +53,6 @@ def readNode(bs,parent=None,ptrfm=None):
     for x in range(bs.readUInt()):
         readNode(bs,name,trfm)
     
-counter = 0
 def readMesh(bs):
     global counter
     u0 = bs.readUInt()
@@ -73,15 +72,12 @@ def readMesh(bs):
         if not x: mat.setTexture(tx_name)
     
     materials.append(mat)
-    print('vstart:',bs.tell())
+
     vnum = bs.readShort()
     vbuf = bs.read(vnum*32)
-    print('vend:',bs.tell())
+
     #bs.read('16B')
     _f = bs.read('4f')
-    print(counter,'_f:',_f)#
-    print('_f:',"%.6f" % _f[0])
-    counter += 1
     if bs.readUByte():
         bs.seek(bs.readShort() * 12 * 4, 1)
        
