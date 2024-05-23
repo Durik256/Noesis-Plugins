@@ -5,6 +5,7 @@ def registerNoesisTypes():
     handle = noesis.register("Crimson Skies (2003)", ".x")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
+    noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
@@ -52,7 +53,9 @@ def readNode(bs,parent=None,ptrfm=None):
     for x in range(bs.readUInt()):
         readNode(bs,name,trfm)
     
+counter = 0
 def readMesh(bs):
+    global counter
     u0 = bs.readUInt()
     clr = bs.read('4B')
     u1 = bs.readUInt()
@@ -70,11 +73,15 @@ def readMesh(bs):
         if not x: mat.setTexture(tx_name)
     
     materials.append(mat)
-    
+    print('vstart:',bs.tell())
     vnum = bs.readShort()
     vbuf = bs.read(vnum*32)
-    
-    bs.read('16B')
+    print('vend:',bs.tell())
+    #bs.read('16B')
+    _f = bs.read('4f')
+    print(counter,'_f:',_f)#
+    print('_f:',"%.6f" % _f[0])
+    counter += 1
     if bs.readUByte():
         bs.seek(bs.readShort() * 12 * 4, 1)
        
@@ -83,7 +90,8 @@ def readMesh(bs):
     
     rapi.rpgSetMaterial(mat_name)
     rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 32)
-    rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, 32, 16)
+    #rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, 32, 16)
+    fixUVs(vbuf, _f[0])
     rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, inum, noesis.RPGEO_TRIANGLE)
     rapi.rpgClearBufferBinds()
 
@@ -98,6 +106,17 @@ def readMesh(bs):
         size=28
         numUnk= bs.readShort()
     bs.seek(numUnk*size, 1)
+   
+def fixUVs(vbuf, uvScale):
+    bs = NoeBitStream(vbuf)
+    uvbuf = b''
+    for x in range(len(vbuf)//32):
+        bs.seek(16,1)
+        u,v = bs.read('2h')
+        bs.seek(12,1)
+        uvbuf += noePack('2f', u*uvScale, v*uvScale)
+        
+    rapi.rpgBindUV1Buffer(uvbuf, noesis.RPGEODATA_FLOAT, 8)
    
 def readString(bs):
     return bs.read(bs.readUInt()).split(b'\x00')[0].decode('ascii', 'ignore')
