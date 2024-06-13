@@ -15,7 +15,7 @@ def noepyLoadModel(data, mdlList):
     bs = NoeBitStream(data)
     ctx = rapi.rpgCreateContext()
   
-    o = [i for i in findall(b'\x09\x00\x00\x00Triangles', data)]
+    o = [i for i in findall(b'\x04\x00\x00\x00Uvs3', data)]
     
     for x in o:
         bs.seek(x - 4)
