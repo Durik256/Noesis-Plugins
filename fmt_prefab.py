@@ -19,6 +19,7 @@ def noepyLoadModel(data, mdlList):
     
     for x in o:
         bs.seek(x - 4)
+        rapi.rpgSetName('m_%i'%x)
         #bs.seek(x + 131)
         #l = bs.read(bs.readUInt()).decode().replace('MAT__','').replace('__CGFX','')
         #rapi.rpgSetName(l)
