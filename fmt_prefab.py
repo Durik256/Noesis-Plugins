@@ -15,13 +15,14 @@ def noepyLoadModel(data, mdlList):
     bs = NoeBitStream(data)
     ctx = rapi.rpgCreateContext()
   
-    vofs = [i for i in findall(b'\x07\x00\x00\x00\x53\x63\x65\x6E\x65\x33\x44\xFA\x06\xA4\x46\x00\x00\x00', data)]
+    o = [i for i in findall(b'\x09\x00\x00\x00Triangles', data)]
     
-    for x in vofs:
-        bs.seek(x + 131)
-        l = bs.read(bs.readUInt()).decode().replace('MAT__','').replace('__CGFX','')
-        rapi.rpgSetName(l)
-        bs.seek(40,1)
+    for x in o:
+        bs.seek(x - 4)
+        #bs.seek(x + 131)
+        #l = bs.read(bs.readUInt()).decode().replace('MAT__','').replace('__CGFX','')
+        #rapi.rpgSetName(l)
+        #bs.seek(40,1)
         
         b0, b1, b2 = b'', b'', b''
         while True:
