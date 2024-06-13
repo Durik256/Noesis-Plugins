@@ -4,13 +4,64 @@ from inc_noesis import *
 def registerNoesisTypes():
 	handle = noesis.register("Uta no Prince-sama♪ LOVE EMOTION", ".prefab")
 	noesis.setHandlerTypeCheck(handle, noepyCheckType)
-	noesis.setHandlerLoadModel(handle, noepyLoadSkel)
+	noesis.setHandlerLoadModel(handle, noepyLoadModel)
 	return 1
 
 def noepyCheckType(data):
     return 1
     
-def noepyLoadSkel(data, mdlList):
+    
+def noepyLoadModel(data, mdlList):
+    bs = NoeBitStream(data)
+    ctx = rapi.rpgCreateContext()
+  
+    vofs = [i for i in findall(b'\x07\x00\x00\x00\x53\x63\x65\x6E\x65\x33\x44\xFA\x06\xA4\x46\x00\x00\x00', data)]
+    
+    for x in vofs:
+        bs.seek(x + 131)
+        l = bs.read(bs.readUInt()).decode().replace('MAT__','').replace('__CGFX','')
+        rapi.rpgSetName(l)
+        bs.seek(40,1)
+        
+        b0, b1, b2 = b'', b'', b''
+        while True:
+            u, sl = bs.read('2I')
+            if not sl:
+                break
+            l = bs.read(sl)
+            bs.seek(118,1)
+            s = bs.readUInt()
+            cp = bs.tell()
+            
+            if l == b'Positions':
+                b0 = bs.read(s)
+            elif l == b'Triangles':
+                b2 = bs.read(s)
+            elif l == b'Uvs3':
+                b1 = bs.read(s)
+            bs.seek(cp+s)
+                
+        rapi.rpgBindPositionBuffer(b0, noesis.RPGEODATA_FLOAT, 12)
+        if b1:
+            rapi.rpgBindUV1Buffer(b1, noesis.RPGEODATA_USHORT, 4)
+        rapi.rpgCommitTriangles(b2, noesis.RPGEODATA_USHORT, len(b2)//2, noesis.RPGEO_TRIANGLE)
+        rapi.rpgClearBufferBinds()
+
+    try:
+        mdl = rapi.rpgConstructModel()
+    except:
+        mdl = NoeModel()
+    mdlList.append(mdl)
+    return 1
+
+def findall(p, s):
+    i = s.find(p)
+    while i != -1:
+        yield i
+        i = s.find(p, i+1)
+    
+'''
+def noepyLoadModel_OLD(data, mdlList):
     bs = NoeBitStream(data)
     ctx = rapi.rpgCreateContext()
     
@@ -42,3 +93,4 @@ def noepyLoadSkel(data, mdlList):
         mdl = NoeModel()
     mdlList.append(mdl)
     return 1
+'''
