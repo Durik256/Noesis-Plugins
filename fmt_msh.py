@@ -1,46 +1,66 @@
 #by Durik256
 from inc_noesis import *
+import math
 
 def registerNoesisTypes():
-    handle = noesis.register("Legacy Of Discord",".msh")
-    noesis.setHandlerTypeCheck(handle, bcCheckType)
-    noesis.setHandlerLoadModel(handle, bcLoadModel)
+    handle = noesis.register("The Movie", ".msh")
+    noesis.setHandlerTypeCheck(handle, noepyCheckType)
+    noesis.setHandlerLoadModel(handle, noepyLoadModel)
+    noesis.logPopup()
     return 1
 
-def bcCheckType(data):
-    if data[:3] != b'PSR':
-        return 0
-    return 1
+def noepyCheckType(data):
 
-def bcLoadModel(data, mdlList):
+    return 1   
+	
+def noepyLoadModel(data, mdlList):
     bs = NoeBitStream(data)
     ctx = rapi.rpgCreateContext()
+    tx_dir = os.path.normpath(os.path.join(os.path.dirname(rapi.getInputName()),'..','textures'))
 
-    bs.seek(20)
-    name = bs.readBytes(bs.readInt() * 2).decode("utf-16")
-    bs.readShort()
-    vtype = bs.readInt()
-    bs.seek(8,1)
-    vnum = bs.readInt()
-    fnum = bs.readInt()
-    bs.seek(32,1)
+    h = bs.read('6I')
+    
+    if h[5]:
+        bs.seek(36)
+    
+    n_txs = []
+    for x in range(h[1]):
+        n_tx = bs.read(32).replace(b'\x00', b'').decode()
+        n_txs.append(n_tx)
+       
+    matList = []
+    for x in range(h[2]):
+        u = bs.read('24B')
+        try:
+            tx = os.path.join(tx_dir, n_txs[u[0]])
+        except:
+            tx = ''
+        matList.append(NoeMaterial('mat_%i'%x, tx))
+        
+    h0 = bs.read('I12f')[0]
+    for x in range(h0):
+        # 0-u; 1-tnum; 2-vnum
+        mh = bs.read('4I17f')
+        
+        ibuf=bs.read(mh[1]*6)
+        bs.seek(myCeil(len(ibuf))-len(ibuf),1)
+        vbuf=bs.read(mh[2]*16)
+        
+        rapi.rpgSetMaterial('mat_%i'%mh[0])
+        rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_USHORT, 16)
+        rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, 16, 12)
+        rapi.rpgCommitTriangles(ibuf,noesis.RPGEODATA_USHORT,mh[1]*3,noesis.RPGEO_TRIANGLE)
+        rapi.rpgClearBufferBinds()
+ 
+    try:
+        mdl = rapi.rpgConstructModel()
+    except:
+        mdl = NoeModel()
 
-    if vtype == 14:
-        stride = 32
-    if vtype == 19:
-        stride = 36
-    if vtype == 23:
-        stride = 40
-
-    vbuf = bs.readBytes(vnum*stride)
-    rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, stride)
-    rapi.rpgBindNormalBufferOfs(vbuf, noesis.RPGEODATA_FLOAT, stride, 12)
-    rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_FLOAT, stride, stride-8)
-    ibuf = bs.readBytes(fnum * 6)
-
-    rapi.rpgSetName(name)
-    rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, fnum * 3, noesis.RPGEO_TRIANGLE)
-
-    mdl = rapi.rpgConstructModel()
+    mdl.setModelMaterials(NoeModelMaterials([], matList))
     mdlList.append(mdl)
+    rapi.setPreviewOption("setAngOfs", "0 0 0")
     return 1
+    
+def myCeil(n):
+    return int(-1 * (n/4) // 1 * -1)*4
