@@ -114,6 +114,9 @@ def readMesh(bs):
         rapi.rpgCommitTriangles(ibuf,noesis.RPGEODATA_USHORT,x[5],noesis.RPGEO_TRIANGLE_STRIP)
     rapi.rpgClearBufferBinds()
 
+def myCeil(n,i):
+    return int(-1 * (n/i) // 1 * -1)*i
+    
 ''' OLD
 #by Durik256
 from inc_noesis import *
