@@ -49,6 +49,9 @@ def ExtractArc(fileName, fileLen, justChecking):
 
     print('unpack All:', h[9])
     return 1
+
+def noepyCheckType(data):
+    return 1  
     
 def noepyLoadModel(data, mdlList):
     bs = NoeBitStream(data,1)
