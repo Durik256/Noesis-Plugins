@@ -5,7 +5,6 @@ def registerNoesisTypes():
     handle = noesis.register("My Om Nom", ".msh")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
@@ -58,10 +57,7 @@ def getBuf(bs):
     return u[-1]//u[-2],t, bs.read(u[-1])
 
 def inf(bs):
-    cpos = bs.tell()
-    u = bs.read('=HB2H2I')
-    print(u, [cpos])
-    return u
+    return bs.read('=HB2H2I')
     
 # 6150 - vec3 float
 # 4102 - vec2 float
