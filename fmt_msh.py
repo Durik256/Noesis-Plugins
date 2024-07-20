@@ -49,16 +49,13 @@ def noepyLoadModel(data, mdlList):
 
 types = {6150:0, 4102:0, 6146:3, 2051:4 }
 def getBuf(bs):
-    u = inf(bs)
+    u = bs.read('=HB2H2I')
     try:
         t = types[u[-3]]
     except:
         t = None
     return u[-1]//u[-2],t, bs.read(u[-1])
 
-def inf(bs):
-    return bs.read('=HB2H2I')
-    
 # 6150 - vec3 float
 # 4102 - vec2 float
 # 2051 - scalar short 
