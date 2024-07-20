@@ -1,66 +1,69 @@
 #by Durik256
 from inc_noesis import *
-import math
 
 def registerNoesisTypes():
-    handle = noesis.register("The Movie", ".msh")
+    handle = noesis.register("My Om Nom", ".msh")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
     noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
-
     return 1   
-	
+
 def noepyLoadModel(data, mdlList):
     bs = NoeBitStream(data)
     ctx = rapi.rpgCreateContext()
-    tx_dir = os.path.normpath(os.path.join(os.path.dirname(rapi.getInputName()),'..','textures'))
 
-    h = bs.read('6I')
-    
-    if h[5]:
-        bs.seek(36)
-    
-    n_txs = []
-    for x in range(h[1]):
-        n_tx = bs.read(32).replace(b'\x00', b'').decode()
-        n_txs.append(n_tx)
-       
-    matList = []
-    for x in range(h[2]):
-        u = bs.read('24B')
-        try:
-            tx = os.path.join(tx_dir, n_txs[u[0]])
-        except:
-            tx = ''
-        matList.append(NoeMaterial('mat_%i'%x, tx))
+    for x in range(5):
+        u = bs.readUShort()
+        if not u:
+            break
+        bs.seek(-2,1)
         
-    h0 = bs.read('I12f')[0]
-    for x in range(h0):
-        # 0-u; 1-tnum; 2-vnum
-        mh = bs.read('4I17f')
-        
-        ibuf=bs.read(mh[1]*6)
-        bs.seek(myCeil(len(ibuf))-len(ibuf),1)
-        vbuf=bs.read(mh[2]*16)
-        
-        rapi.rpgSetMaterial('mat_%i'%mh[0])
-        rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_USHORT, 16)
-        rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_USHORT, 16, 12)
-        rapi.rpgCommitTriangles(ibuf,noesis.RPGEODATA_USHORT,mh[1]*3,noesis.RPGEO_TRIANGLE)
-        rapi.rpgClearBufferBinds()
- 
+        stride, type, buf = getBuf(bs)
+        if u == 513:
+            rapi.rpgBindPositionBuffer(buf, type, stride)
+        elif u == 1:
+            rapi.rpgBindUV1Buffer(buf, type, stride)
+        elif u == 257:
+            rapi.rpgBindNormalBuffer(buf, type, stride)
+
+    numSM = bs.readUInt24()
+    for _ in range(numSM):
+        stride, type, buf = getBuf(bs)
+        u = bs.read('=IHB')
+        fmt = 10 if u[0] else 2
+
+        rapi.rpgSetName('mesh_%i'%_)
+        rapi.rpgCommitTriangles(buf,type,len(buf)//stride, fmt)
+
+    rapi.rpgSetOption(noesis.RPGOPT_TRIWINDBACKWARD, 1)
     try:
         mdl = rapi.rpgConstructModel()
     except:
         mdl = NoeModel()
 
-    mdl.setModelMaterials(NoeModelMaterials([], matList))
     mdlList.append(mdl)
-    rapi.setPreviewOption("setAngOfs", "0 0 0")
+    rapi.setPreviewOption("setAngOfs", "0 -90 0")
     return 1
+
+types = {6150:0, 4102:0, 6146:3, 2051:4 }
+def getBuf(bs):
+    u = inf(bs)
+    try:
+        t = types[u[-3]]
+    except:
+        t = None
+    return u[-1]//u[-2],t, bs.read(u[-1])
+
+def inf(bs):
+    cpos = bs.tell()
+    u = bs.read('=HB2H2I')
+    print(u, [cpos])
+    return u
     
-def myCeil(n):
-    return int(-1 * (n/4) // 1 * -1)*4
+# 6150 - vec3 float
+# 4102 - vec2 float
+# 2051 - scalar short 
+# 6146 - vec3 short
