@@ -36,7 +36,7 @@ def LoadModel(data, mdlList):
         for x in range(numBones):
             f = bs.read('>12f')
             print(f)
-            mat = NoeMat43()
+            mat = NoeQuat(f[4:8]).toMat43()#NoeMat43()
             mat[3] = NoeVec3(f[:3])
             bones[x].setMatrix(mat)
         
