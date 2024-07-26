@@ -2,7 +2,7 @@
 from inc_noesis import *
 import zlib
 
-extract_ORIG = True
+extract_ORIG = False
 
 def registerNoesisTypes():
     handle = noesis.register("Crash Bandicoot Nitro Kart 3D", ".zlib; .plzp; .lang; .vfs")
