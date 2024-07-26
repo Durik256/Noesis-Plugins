@@ -32,12 +32,9 @@ def Extract(fileName, fileLen, justChecking):
             u0, numFile = noeUnpack('2I', f.read(8))
             for x in range(numFile):
                 ofs, h, size = noeUnpack('3I', f.read(12))
-                print(ofs, h, size)
                 cpos = f.tell()
                 f.seek(ofs)
-                print('ofs:',f.tell())
                 data = f.read(size)
-                print('len(data)',len(data), data[:4])
                 name = str(hex(h)).replace('0x', '')
                 _ext = getEXT(data[:4]).lower()
 
