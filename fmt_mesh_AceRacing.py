@@ -5,7 +5,6 @@ def registerNoesisTypes():
     handle = noesis.register("Ace Racing", ".mesh")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
