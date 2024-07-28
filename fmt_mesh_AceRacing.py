@@ -8,10 +8,10 @@ def registerNoesisTypes():
     return 1
 
 def noepyCheckType(data):
-    if data[1:8] != b'MESSIAH':
+    if data[:8] != b'.MESSIAH':  # Modified to check the first 8 bytes
         return 0
     return 1   
-	
+
 def noepyLoadModel(data, mdlList):
     bs = NoeBitStream(data)
     ctx = rapi.rpgCreateContext()
@@ -23,25 +23,27 @@ def noepyLoadModel(data, mdlList):
 
     a = []
     for _ in range(4):
-        a.append(parseA(bs.read(bs.readUShort()).decode()))
+        str_len = bs.readUShort()
+        str_data = bs.readBytes(str_len).decode()# Changed to readBytes
+        a.append(parseA(str_data))
     
     bs.seek(40, 1)
     sm = [bs.read('4I') for x in range(numSM)]
 
     if vnum > 65535:
-        ibuf = bs.read(inum*4)
+        ibuf = bs.readBytes(inum*4)  # Changed to readBytes
         ifmt = noesis.RPGEODATA_UINT
     else:
-        ibuf = bs.read(inum*2)
+        ibuf = bs.readBytes(inum*2)  # Changed to readBytes
         ifmt = noesis.RPGEODATA_USHORT
 
     u = 0
     for _ in a:
-        buf = bs.read(_[0]*vnum)
+        buf = bs.readBytes(_[0]*vnum)  # Changed to readBytes
         if _[1]:
             rapi.rpgBindPositionBufferOfs(buf, _[1][1], _[0], _[1][0])
         for x in _[2]:
-            rapi.rpgBindUVXBufferOfs(buf, x[1], _[0], u, 2, x[0])
+            rapi.rpgBindUV1BufferOfs(buf, x[1], _[0], x[0])  # Corrected to rpgBindUV1BufferOfs
             u += 1
 
     rapi.rpgCommitTriangles(ibuf, ifmt, inum, noesis.RPGEO_TRIANGLE)
