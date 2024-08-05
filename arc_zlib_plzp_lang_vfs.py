@@ -76,6 +76,8 @@ def getEXT(magic):
         return '.id3'
     elif magic == b'FORM':
         return '.form'
+    elif magic == b'\x34\x00\x00\x00':
+        return '.pvr'
     elif magic[:1] == b'\x78':
         return '.zlib'
     else:
