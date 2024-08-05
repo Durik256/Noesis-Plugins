@@ -97,7 +97,7 @@ def exportLANG(data):
     bs = NoeBitStream(data)
     magic, numFile, u0, u1, lenS = bs.read('5I')
     _data = bs.read(lenS)
-    if _data[-2] != b'\x00':
+    if _data[lenS-2:] != b'\x00\x00':
         names = [x.decode('ascii', errors='ignore') for x in _data.split(b'\x00')]
     else:
         names = [x.replace(b'\x00', b'').decode('ascii', errors='ignore') for x in _data.split(b'\x00\x00')]
