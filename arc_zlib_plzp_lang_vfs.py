@@ -73,7 +73,7 @@ def getEXT(magic):
     elif magic == b'PFNT':
         return '.pfnt'
     elif magic == b'ID3\x03':
-        return '.id3'
+        return '.mp3'
     elif magic == b'FORM':
         return '.form'
     elif magic == b'\x34\x00\x00\x00':
