@@ -5,16 +5,16 @@ import zlib
 extract_ORIG = False
 
 def registerNoesisTypes():
-    handle = noesis.register("Crash Bandicoot Nitro Kart 3D", ".zlib; .plzp; .lang; .vfs")
+    handle = noesis.register("Crash Bandicoot Nitro Kart 3D", ".vfs;.zlib;.plzp;.lang") #CBNK2 (iOS)
     noesis.setHandlerExtractArc(handle, Extract)
     return 1
     
 def Extract(fileName, fileLen, justChecking):
     if fileLen < 16:
         return 0
-        
+
     if justChecking: #it's valid
-            return 1
+        return 1
 
     name, ext = os.path.splitext(fileName)
     with open(fileName, 'rb') as f:
@@ -94,7 +94,12 @@ def exportPLZP(name, data):
 def exportLANG(data):
     bs = NoeBitStream(data)
     magic, numFile, u0, u1, lenS = bs.read('5I')
-    names = [x.replace(b'\x00', b'').decode('ascii', errors='ignore') for x in bs.read(lenS).split(b'\x00\x00')]
+    _data = bs.read(lenS)
+    if _data[-2] != b'\x00':
+        names = [x.decode('ascii', errors='ignore') for x in _data.split(b'\x00')]
+    else:
+        names = [x.replace(b'\x00', b'').decode('ascii', errors='ignore') for x in _data.split(b'\x00\x00')]
+    print(names)
     for x in range(numFile):
         inf = bs.read('4I')
         cpos = bs.tell()
