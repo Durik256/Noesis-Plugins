@@ -1,5 +1,6 @@
 #by Durik256
 from inc_noesis import *
+import os
 import zlib
 
 extract_ORIG = False
