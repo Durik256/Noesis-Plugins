@@ -28,10 +28,10 @@ def LoadModel(data, mdlList):
         i = bs.read('2I')
         bonemaps.append(bs.read('%iI'%i[0]))
         
-        
     for x in range(h[4]):#
         bs.seek(mgOfs[x])
         mi = bs.read('24I')
+        rapi.rpgSetName('mesh_%i'%x)
         for j in range(mi[0]):#
             smi = bs.read('4i')
 
@@ -40,7 +40,6 @@ def LoadModel(data, mdlList):
                 ifmt = noesis.RPGEO_TRIANGLE
 
             rapi.rpgSetBoneMap(bonemaps[smi[2]])
-            rapi.rpgSetName('mesh_%i_%i'%(x,j))
             rapi.rpgBindPositionBuffer(readBuf(smi[0],bs), noesis.RPGEODATA_FLOAT, 16)
             rapi.rpgBindBoneIndexBuffer(readWIBuf(smi[0],bs), noesis.RPGEODATA_UINT, 16, 4)
             rapi.rpgBindBoneWeightBuffer(readBuf(smi[0],bs), noesis.RPGEODATA_FLOAT, 16, 4)
