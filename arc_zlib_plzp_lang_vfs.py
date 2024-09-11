@@ -79,6 +79,8 @@ def getEXT(magic):
         return '.form'
     elif magic == b'\x34\x00\x00\x00':
         return '.pvr'
+    elif magic == b'\x4D\x3C\x2B\x1A':
+        return '.sggr'
     elif magic == b'<!--':
         return '.xml'
     elif magic == b'PSND':
