@@ -5,22 +5,21 @@ def registerNoesisTypes():
     handle = noesis.register("scion of fate online", ".mdl")
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    noesis.logPopup()
+    #noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
-    if data[:4] != b'\xFF\xFF\xFF\xFF':
-        return 0
     return 1
 	
 def noepyLoadModel(data, mdlList):
+    if data[:4] == b'\xFF\xFF\xFF\xFF':
+        data = data[546:]
     bs = NoeBitStream(data)
     ctx = rapi.rpgCreateContext()
 
-    bs.seek(614)
-    tx = bs.read(32).rstrip(b'\x00').decode('ascii', errors='ignore')
+    bs.seek(68)
+    tx = bs.read(40).split(b'\x00')[0].decode('ascii', errors='ignore')
 
-    bs.seek(654)
     vnum, tnum = bs.read('2I')
     vbuf = bs.read(vnum*32)
     ibuf = bs.read(tnum*6)
