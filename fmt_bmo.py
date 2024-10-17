@@ -33,10 +33,12 @@ def noepyLoadModel(data, mdlList):
         mat[3] = pos
         bones.append(NoeBone(x,b_name,mat,None,parent))
         
+    materials = []
     numMat = bs.readUShort()
     sm = []
     for x in range(numMat):
         label = bs.readString()
+        LoadMaterial(label, materials)
         u_inf = []
         if v0 == 3: 
             unk = bs.read('=4B')
@@ -65,6 +67,7 @@ def noepyLoadModel(data, mdlList):
         
         rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 36)
         rapi.rpgBindNormalBufferOfs(vbuf, noesis.RPGEODATA_FLOAT, 36,12)
+        rapi.rpgSetUVScaleBias(NoeVec3([1,-1,1]),None)
         rapi.rpgBindUV1BufferOfs(vbuf, noesis.RPGEODATA_FLOAT, 36,24)
         
         rapi.rpgBindBoneIndexBuffer(noePack('4H', *bi)*x[2], noesis.RPGEODATA_USHORT, 8, 4)
@@ -79,6 +82,30 @@ def noepyLoadModel(data, mdlList):
         mdl = NoeModel()
     
     mdl.setBones(bones)
+    mdl.setModelMaterials(NoeModelMaterials([],materials))
     mdlList.append(mdl)
+
     rapi.setPreviewOption("setAngOfs", "0 -90 0")
     return 1
+    
+def LoadMaterial(label, materials):
+    for x in materials:
+        if x.name == label:
+            return
+    
+    mat = NoeMaterial(label, '')
+    
+    try:
+        dir = os.path.dirname(rapi.getInputName())
+        mat_path = os.path.abspath(os.path.join(dir, '..', 'Materials', label+'.mat'))
+        tx_dir = os.path.abspath(os.path.join(dir, '..', 'Textures'))
+        
+        data = rapi.loadIntoByteArray(mat_path)
+        for line in data.decode().split('\n'):
+            if line.startswith('Map:'):
+                tx_name = line.split('Map:')[-1].replace('"', '').strip()
+                mat.setTexture(os.path.join(tx_dir,tx_name))
+    except:
+        pass
+    
+    materials.append(mat)
