@@ -62,7 +62,6 @@ def noepyLoadModel(data, mdlList):
 
         x = u1[-1]
         vbuf = bs.read(x[2]*36)
-        print('vnum:', x[2], 'bi:', bi)
         
         rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 36)
         rapi.rpgBindNormalBufferOfs(vbuf, noesis.RPGEODATA_FLOAT, 36,12)
