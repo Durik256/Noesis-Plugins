@@ -11,7 +11,5 @@ def CheckType(data):
     return 1
     
 def LoadRGBA(data, texList):
-    bs = NoeBitStream(data)
-    data = bs.readBytes(size)
     texList.append(rapi.loadTexByHandler(data, '.DDS'))  
     return 1
