@@ -1,4 +1,5 @@
 #by Durik256
+#u need change ext for you file on *.s_msh (Sims mesh)
 from inc_noesis import *
 
 def registerNoesisTypes():
@@ -90,4 +91,3 @@ def createFaces(buf, vnum):
         ibuf += noePack('H', x)
             
     return ibuf
-        
