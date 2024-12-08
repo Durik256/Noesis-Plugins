@@ -1,4 +1,5 @@
 #by Durik256
+#change ext to *.EG2WD in your file
 from inc_noesis import *
 
 def registerNoesisTypes():
