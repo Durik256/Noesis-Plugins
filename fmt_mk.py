@@ -21,9 +21,7 @@ def noepyLoadModel(data, mdlList):
     
     for i,x in enumerate(result[:-1]):
         bs.seek(x)
-        vnum = bs.read('56B')
-        print(vnum)
-        vnum = vnum[40]
+        vnum = bs.read('56B')[40]
         end_vbuf = data.rfind(b'\x00\x00\x00\x17', bs.tell(), result[i+1])
         stride = min((end_vbuf - bs.tell()) // vnum, 48)
         print(i, [x], 'vnum:',vnum, 'stride:', stride)
