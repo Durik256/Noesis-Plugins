@@ -5,7 +5,6 @@ def registerNoesisTypes():
     handle = noesis.register("Resident Evil Mercenaries", ".mcms") #  VS (iOS)
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
-    noesis.logPopup()
     return 1
 
 def noepyCheckType(data):
@@ -17,9 +16,7 @@ def noepyLoadModel(data, mdlList):
     
     unk, fOfs, fSize = bs.read('3I')
 
-    
-    bs.seek(fOfs)
-    bs.read(12) # MCM_, 0, 0
+    bs.seek(fOfs+12) # + MCM_, 0, 0
     
     while bs.tell() < bs.getSize():
         numBlock = bs.readUShort()
