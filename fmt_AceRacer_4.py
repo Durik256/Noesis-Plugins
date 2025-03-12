@@ -2,7 +2,7 @@
 from inc_noesis import *
 
 def registerNoesisTypes():
-    handle = noesis.register("Ace Racer [lzma]", ".4")
+    handle = noesis.register("Ace Racer [lzma]", ".4") #Messiah Engine
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadRGBA(handle, noepyLoadRGBA)
     return 1
@@ -35,7 +35,6 @@ def noepyLoadRGBA(data, texList):
         # 0-blockSize; 1-width; 2-height; 3-unk; decSize;
         _ = bs.read('IHHII')
         label = bs.read(4)
-        print(label, _)
         
         if label == b'NNNN':
             pass
