@@ -27,7 +27,7 @@ def noepyLoadRGBA(data, texList):
     DKDave — Yesterday, at 23:49
     Some more info on the image types from the .4 file header: 0x24 = ASTC 4x4, 0x26 = ASTC 5x5, 0x28 = ASTC 6x6, 0x2B = ASTC 8x8
     '''
-    ASTC_type = {0x24:[8,8,1,1],0x26:[8,8,1,1],0x28:[8,8,1,1],0x2B:[8,8,1,1]}
+    ASTC_type = {0x24:[4,4,1,1],0x26:[5,5,1,1],0x28:[6,6,1,1],0x2B:[8,8,1,1]}
     blockvwidth, blockvheight, block_depth, depth = ASTC_type.get(h[5], [8,8,1,1])
 
     for x in range(numChunk):
