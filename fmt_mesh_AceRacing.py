@@ -2,7 +2,7 @@
 from inc_noesis import *
 
 def registerNoesisTypes():
-    handle = noesis.register("Ace Racing", ".mesh")
+    handle = noesis.register("Ace Racer", ".mesh") # Messiah Engine
     noesis.setHandlerTypeCheck(handle, noepyCheckType)
     noesis.setHandlerLoadModel(handle, noepyLoadModel)
     return 1
