@@ -36,24 +36,48 @@ def noepyLoadModel(data, mdlList):
     
     #for x in range(m_inf):
     bs.seek(m_ofs)
-    sm_inf = bs.read('12I') #0-block_size; 1-vnum; 2,3-zero; 4-uv_num; 5-polygon_num; 6-u0; 7-u1; 8,9,10,11-zero
+    sm_inf = bs.read('12I') #0-block_size; 1-vnum; 2-norm_num;3-zero; 4-uv_num; 5-polygon_num; 6-u0; 7-u1; 8,9,10,11-zero
 
     vbuf = bs.read(sm_inf[1]*16)
+    
     uvbuf_size = sm_inf[4]*8
     uvbuf = bs.read(uvbuf_size)
+    bs.seek(align16(uvbuf_size)-uvbuf_size,1)
+    
+    nbuf_size = sm_inf[2]*8
+    nbuf = bs.read(nbuf_size)
+    bs.seek(align16(nbuf_size)-nbuf_size,1)
+    
     rapi.rpgBindPositionBuffer(vbuf, noesis.RPGEODATA_FLOAT, 16)
     
-    bs.seek(align16(uvbuf_size)-uvbuf_size,1)
-
+    face_size = 1
+    if uvbuf_size:
+        face_size += 1
+    if nbuf_size:
+        face_size += 1
+        
+    bs.seek(4096)
+        
     for x in range(sm_inf[5]):
+        star_face = bs.tell()
+        '''
         _ = bs.read('16H') #0-zero; 1-num_index; index -> [0-uv_index; 1-v_index]
+        '''
+        _ = bs.read('2H') #0-zero; 1-num_index;
         print(_)
-
+        
         ibuf = b'' 
         for i in range(_[1]): 
-            ibuf += noePack('H', _[3+i*2])
-            
+            #ibuf += noePack('H', _[3+i*2])
+            f = bs.read('%iH'%face_size)
+            print(' f:', f)
+            ibuf += noePack('H', f[-1])
+        
+        face_block_size = bs.tell() - star_face
+        bs.seek(align16(face_block_size)-face_block_size,1)
+        
         rapi.rpgCommitTriangles(ibuf, noesis.RPGEODATA_USHORT, len(ibuf)//2, noesis.RPGEO_TRIANGLE_STRIP)
+
 
     mdl = rapi.rpgConstructModel()
     mdlList.append(mdl)
