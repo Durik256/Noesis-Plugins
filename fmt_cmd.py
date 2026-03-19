@@ -56,7 +56,7 @@ def noepyLoadModel(data, mdlList):
     if nbuf_size:
         face_size += 1
         
-    bs.seek(4096)
+    #bs.seek(4096)
         
     for x in range(sm_inf[5]):
         star_face = bs.tell()
