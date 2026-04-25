@@ -4,7 +4,7 @@ def registerNoesisTypes():
     handle = noesis.register("MascotCapsule model", ".mbac")
     noesis.setHandlerTypeCheck(handle, mbacCheckType)
     noesis.setHandlerLoadModel(handle, mbacLoadModel)
-    noesis.logPopup()
+    #noesis.logPopup()
     return 1
 
 MBAC_HEADER = 0x424D
@@ -84,6 +84,9 @@ def mbacLoadModel(data, mdlList):
             unknown = unp.UBit(unk_bits)
             a, b, c = [unp.UBit(vertex_index_bits) for x in range(3)]
             color_id = unp.UBit(color_id_bits)
+
+            for i,x in enumerate([a, b, c]):
+                uvs[x]=(NoeVec3([0,0,0]))
             
             faces += [c, b, a]
             
@@ -91,6 +94,9 @@ def mbacLoadModel(data, mdlList):
             unknown = unp.UBit(unk_bits)
             a, b, c, d = [unp.UBit(vertex_index_bits) for x in range(4)]
             color_id = unp.UBit(color_id_bits)
+            
+            for i,x in enumerate([a, b, c, d]):
+                uvs[x]=(NoeVec3([0,0,0]))
             
             faces += [c, b, a, d, b, c]
             
@@ -107,7 +113,9 @@ def mbacLoadModel(data, mdlList):
             uv = [unp.UBit(uv_bits) for x in range(6)]
             
             for i,x in enumerate([a, b, c]):
-                uvs[x]=(NoeVec3(uv[i*2:i*2+2]+[0]))
+                uvU, uvV = uv[i*2:i*2+2]
+                uvs[x]=(NoeVec3([uvU/255.0, uvV/255.0,0]))
+                
             faces += [c, b, a]
             
         for i in range(num_polyt4):
@@ -116,7 +124,9 @@ def mbacLoadModel(data, mdlList):
             uv = [unp.UBit(uv_bits) for x in range(8)]
             
             for i,x in enumerate([a, b, c, d]):
-                uvs[x]=(NoeVec3(uv[i*2:i*2+2]+[0]))
+                uvU, uvV = uv[i*2:i*2+2]
+                uvs[x]=(NoeVec3([uvU/255.0, uvV/255.0,0]))
+                
             faces += [c, b, a, d, b, c]
 
     # decode bones
