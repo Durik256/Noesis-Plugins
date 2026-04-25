@@ -69,7 +69,8 @@ def mbacLoadModel(data, mdlList):
             
     # decode polygons
     unp = Unpacker(bs)
-    
+
+    uvs = [None]*num_vertices
     if num_polyf3 + num_polyf4 > 0:
         unk_bits = unp.UBit(8)
         vertex_index_bits = unp.UBit(8)
@@ -101,7 +102,6 @@ def mbacLoadModel(data, mdlList):
             faces += [c, b, a, d, b, c]
             
     if num_polyt3 + num_polyt4 > 0:
-        uvs = [None]*num_vertices
         unk_bits = unp.UBit(8)
         vertex_index_bits = unp.UBit(8)
         uv_bits = unp.UBit(8)
